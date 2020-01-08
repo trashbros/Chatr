@@ -40,11 +40,11 @@ namespace ChatterConsole
                 }
             }
 
-            // Create a new Chatter node
-            var chatterNode = new Chatter.Node(IPAddress.Parse(ipAddress), IPAddress.Parse("239.255.10.11"), 1314);
+            // Create a new Chatter client
+            var chatterClient = new Chatter.Client(IPAddress.Parse(ipAddress), IPAddress.Parse("239.255.10.11"), 1314);
 
             // Attach a message handler
-            chatterNode.MessageReceivedEventHandler += (sender, m) =>
+            chatterClient.MessageReceivedEventHandler += (sender, m) =>
             {
                 HandleMessagingCalls(m, displayName);
             };
@@ -52,7 +52,7 @@ namespace ChatterConsole
             // Start task to receive messages
             Task.Run(() =>
             {
-                chatterNode.StartReceiving();
+                chatterClient.StartReceiving();
             });
 
             // Get messages and send them out
@@ -67,7 +67,7 @@ namespace ChatterConsole
             {
                 if (!string.IsNullOrEmpty(message))
                 {
-                    chatterNode.Send(displayName + ">" + message);
+                    chatterClient.Send(displayName + ">" + message);
                 }
 
                 message = Console.ReadLine().Trim();

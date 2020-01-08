@@ -15,7 +15,7 @@ namespace Chatter
             SenderIP = senderIP;
         }
     }
-    public class Node
+    public class Client
     {
         public IPAddress LocalIP { get; }
         public IPAddress MulticastIP { get; }
@@ -23,7 +23,7 @@ namespace Chatter
 
         public event EventHandler<MessageReceivedEventArgs> MessageReceivedEventHandler;
 
-        public Node(IPAddress localIP, IPAddress multicastIP, int port)
+        public Client(IPAddress localIP, IPAddress multicastIP, int port)
         {
             LocalIP = localIP;
             MulticastIP = multicastIP;
