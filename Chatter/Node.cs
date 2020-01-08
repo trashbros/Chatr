@@ -34,31 +34,30 @@ namespace Chatter
 
         public void StartReceiving()
         {
-            using (var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            try
             {
-                sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                sock.Bind(new IPEndPoint(IPAddress.Any, Port));
-                sock.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(MulticastIP, LocalIP));
-
-                IPEndPoint remoteIPEndpoint = new IPEndPoint(MulticastIP, 0);
-                EndPoint remoteEndPoint = remoteIPEndpoint;
-
-                try
+                using (var udpClient = new UdpClient())
                 {
+                    udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    udpClient.Client.Bind(new IPEndPoint(LocalIP, Port));
+
+                    udpClient.JoinMulticastGroup(MulticastIP);
+
+                    IPEndPoint remoteIPEndPoint = new IPEndPoint(MulticastIP, 0);
+
                     while (true)
                     {
-                        byte[] datagram = new byte[65536];
-                        int length = sock.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
-                        Array.Resize(ref datagram, length);
+                        byte[] datagram = udpClient.Receive(ref remoteIPEndPoint);
 
                         string message = Encoding.UTF8.GetString(datagram);
-                        MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndpoint.Address));
+
+                        MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
                     }
                 }
-                catch (SocketException e)
-                {
-                    Console.WriteLine(e);
-                }
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine(e);
             }
         }
 
