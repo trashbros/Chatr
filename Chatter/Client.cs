@@ -32,29 +32,31 @@ namespace Chatter
 
         public void StartReceiving()
         {
-            try
+            using (var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
-                using (var udpClient = new UdpClient())
+                sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                sock.Bind(new IPEndPoint(IPAddress.Any, Port));
+                sock.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(MulticastIP, LocalIP));
+
+                IPEndPoint remoteIPEndpoint = new IPEndPoint(MulticastIP, 0);
+                EndPoint remoteEndPoint = remoteIPEndpoint;
+
+                try
                 {
-                    udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                    udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, Port));
-
-                    udpClient.JoinMulticastGroup(MulticastIP);
-
-                    IPEndPoint remoteIPEndPoint = new IPEndPoint(MulticastIP, 0);
-
                     while (true)
                     {
-                        byte[] datagram = udpClient.Receive(ref remoteIPEndPoint);
-                        string message = Encoding.UTF8.GetString(Convert.FromBase64String(Encoding.UTF8.GetString(datagram)));
+                        byte[] datagram = new byte[65536];
+                        int length = sock.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
+                        Array.Resize(ref datagram, length);
 
-                        MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
+                        string message = Encoding.UTF8.GetString(Convert.FromBase64String(Encoding.UTF8.GetString(datagram)));
+                        MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndpoint.Address));
                     }
                 }
-            }
-            catch (SocketException e)
-            {
-                Console.WriteLine(e);
+                catch (SocketException e)
+                {
+                    Console.WriteLine(e);
+                }
             }
         }
 
