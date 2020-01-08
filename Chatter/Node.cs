@@ -37,7 +37,7 @@ namespace Chatter
                 using (var udpClient = new UdpClient())
                 {
                     udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                    udpClient.Client.Bind(new IPEndPoint(LocalIP, Port));
+                    udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, Port));
 
                     udpClient.JoinMulticastGroup(MulticastIP);
 
@@ -46,8 +46,7 @@ namespace Chatter
                     while (true)
                     {
                         byte[] datagram = udpClient.Receive(ref remoteIPEndPoint);
-
-                        string message = Encoding.UTF8.GetString(datagram);
+                        string message = Encoding.UTF8.GetString(Convert.FromBase64String(Encoding.UTF8.GetString(datagram)));
 
                         MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
                     }
@@ -63,7 +62,7 @@ namespace Chatter
         {
             using (var udpClient = new UdpClient(new IPEndPoint(LocalIP, 0)))
             {
-                byte[] datagram = Encoding.UTF8.GetBytes(message);
+                byte[] datagram = Encoding.UTF8.GetBytes(Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
                 udpClient.Send(datagram, datagram.Length, new IPEndPoint(MulticastIP, Port));
             }
         }
