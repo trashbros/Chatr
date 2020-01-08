@@ -93,7 +93,7 @@ namespace ChatterConsole
                 {
                     // Display the message
                     text = text.Substring(displayName.Length);
-                    Console.Write($"\n< [{ senderName }: { text.Trim() }]\n> ");
+                    Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
                 }
             }
             else
