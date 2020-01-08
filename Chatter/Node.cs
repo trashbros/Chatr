@@ -66,8 +66,6 @@ namespace Chatter
         {
             using (var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
-                sock.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 10);
-
                 byte[] datagram = Encoding.UTF8.GetBytes(message);
                 sock.Bind(new IPEndPoint(LocalIP, 0));
                 sock.SendTo(datagram, 0, datagram.Length, SocketFlags.None, new IPEndPoint(MulticastIP, Port));
