@@ -57,7 +57,11 @@ namespace ChatterConsole
 
             // Get messages and send them out
             Console.Write("> ");
-            string message = Console.ReadLine();
+            string message = Console.ReadLine().Trim();
+            Console.SetCursorPosition(0, Console.CursorTop - 1);
+            Console.Write(new string(' ', Console.WindowWidth - 1));
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write("> ");
 
             while (message.ToLower() != "/quit")
             {
@@ -66,8 +70,11 @@ namespace ChatterConsole
                     chatterNode.Send(displayName + ">" + message);
                 }
 
-                Console.Write("\n> ");
-                message = Console.ReadLine();
+                message = Console.ReadLine().Trim();
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.Write(new string(' ', Console.WindowWidth - 1));
+                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.Write("> ");
             };
         }
 
@@ -86,13 +93,13 @@ namespace ChatterConsole
                 {
                     // Display the message
                     text = text.Substring(displayName.Length);
-                    Console.WriteLine($"\n< { senderName }: { text } \n> ");
+                    Console.Write($"\n< [{ senderName }: { text.Trim() }]\n> ");
                 }
             }
             else
             {
                 // Display the message
-                Console.WriteLine($"\n< { senderName }: { text } \n> ");
+                Console.Write($"\n< { senderName }: { text }\n> ");
             }
         }
     }
