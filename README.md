@@ -9,3 +9,21 @@ Internal server-less client for communicating between development machines. Curr
 ## Use Instructions
 - Run the EXE
 - Start chatting in the console window
+
+## Special Commands
+- Application Quit
+  
+    `/q`
+    `/quit`
+
+- Private Message
+
+    `/pm [username] [message]`
+
+
+## To-Do
+- Issue with messages not recieving/appearing
+- Set up as background console notifications rather than full control app
+- Able to connect in and get notifications on repo pushes
+- Setup a release pipeline
+- Console text coloring for message push?
