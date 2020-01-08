@@ -64,11 +64,10 @@ namespace Chatter
 
         public void Send(string message)
         {
-            using (var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            using (var udpClient = new UdpClient(new IPEndPoint(LocalIP, 0)))
             {
                 byte[] datagram = Encoding.UTF8.GetBytes(message);
-                sock.Bind(new IPEndPoint(LocalIP, 0));
-                sock.SendTo(datagram, 0, datagram.Length, SocketFlags.None, new IPEndPoint(MulticastIP, Port));
+                udpClient.Send(datagram, datagram.Length, new IPEndPoint(MulticastIP, Port));
             }
         }
     }
