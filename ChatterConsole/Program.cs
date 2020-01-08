@@ -63,7 +63,7 @@ namespace ChatterConsole
             Console.SetCursorPosition(0, Console.CursorTop);
             Console.Write("> ");
 
-            while (message.ToLower() != "/quit")
+            while (!IsQuitMessage(message))
             {
                 if (!string.IsNullOrEmpty(message))
                 {
@@ -101,6 +101,12 @@ namespace ChatterConsole
                 // Display the message
                 Console.Write($"\n< { senderName }: { text }\n> ");
             }
+        }
+
+        static bool IsQuitMessage(string message)
+        {
+            string text = message.ToLower();
+            return (text == "/quit" || text == "/q");
         }
     }
 }
