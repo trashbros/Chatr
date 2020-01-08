@@ -84,11 +84,36 @@ namespace ChatterConsole
             string senderName = m.Message.Split('>')[0];
             string text = m.Message.Substring(senderName.Length + 1);
 
-            // Check to see if this is a private message
-            if (text.StartsWith("/pm "))
+            //// Check to see if this is a private message
+            //if (text.StartsWith("/pm "))
+            //{
+            //    // Check to see if this private message is to me
+            //    text = text.Substring(4).Trim();
+            //    if (text.StartsWith(displayName + " "))
+            //    {
+            //        // Display the message
+            //        text = text.Substring(displayName.Length);
+            //        Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
+            //    }
+            //}
+            if(text.StartsWith("/"))
             {
-                // Check to see if this private message is to me
-                text = text.Substring(4).Trim();
+                text = text.TrimStart('/');
+                HandleCommandText(text, senderName, displayName);
+            }
+            else
+            {
+                // Display the message
+                Console.Write($"\n< { senderName }: { text }\n> ");
+            }
+        }
+
+        static void HandleCommandText(string message, string senderName, string displayName)
+        {
+            string command = message.Split(' ')[0];
+            if(command == "pm")
+            {
+                string text = message.Substring(3).Trim();
                 if (text.StartsWith(displayName + " "))
                 {
                     // Display the message
@@ -96,10 +121,13 @@ namespace ChatterConsole
                     Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
                 }
             }
-            else
+            else if(command == "users")
             {
-                // Display the message
-                Console.Write($"\n< { senderName }: { text }\n> ");
+                //chatterClient.Send(displayName + ">" + "/userinfo");
+            }
+            else if(command == "userinfo")
+            {
+                Console.Write($"\n[{ senderName } Logged In]\n> ");
             }
         }
 
