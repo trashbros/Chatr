@@ -73,23 +73,26 @@ namespace ChatterConsole
 
         static void HandleMessagingCalls(Chatter.MessageReceivedEventArgs m, string displayName)
         {
+            // Parse out the sender name
+            string senderName = m.Message.Split('>')[0];
+            string text = m.Message.Substring(senderName.Length + 1);
+
             // Check to see if this is a private message
-            string outputMessage = m.Message;
-            if (outputMessage.StartsWith("/pm "))
+            if (text.StartsWith("/pm "))
             {
                 // Check to see if this private message is to me
-                outputMessage = outputMessage.Substring(4).Trim();
-                if (outputMessage.StartsWith(displayName + " "))
+                text = text.Substring(4).Trim();
+                if (text.StartsWith(displayName + " "))
                 {
                     // Display the message
-                    outputMessage = outputMessage.Substring(displayName.Length);
-                    Console.WriteLine($"\n< { m.SenderName }: {outputMessage} \n> ");
+                    text = text.Substring(displayName.Length);
+                    Console.WriteLine($"\n< { senderName }: { text } \n> ");
                 }
             }
             else
             {
                 // Display the message
-                Console.WriteLine($"\n< { m.SenderName }: {m.Message} \n> ");
+                Console.WriteLine($"\n< { senderName }: { text } \n> ");
             }
         }
     }

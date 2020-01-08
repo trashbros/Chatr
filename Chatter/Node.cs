@@ -9,11 +9,9 @@ namespace Chatter
     {
         public string Message { get; }
         public IPAddress SenderIP { get; }
-        public string SenderName { get; }
         public MessageReceivedEventArgs(string message, IPAddress senderIP)
         {
-            SenderName = message.Split('>')[0];
-            Message = message.Substring(SenderName.Length + 1);
+            Message = message;
             SenderIP = senderIP;
         }
     }
