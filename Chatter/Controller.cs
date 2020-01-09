@@ -112,11 +112,17 @@ namespace Chatter
                 // Private message
                 case CommandList.PM:
                     string text = message.Substring(CommandList.PM.Length + 1).Trim();
-                    if (text.StartsWith(DisplayName + " ") || senderName == DisplayName)
+                    if (text.StartsWith(DisplayName + " ") )
                     {
                         // Display the message
-                        text = text.Substring(DisplayName.Length);
-                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [PM]{ senderName }: { text.Trim() }", (senderName != DisplayName)));
+                        text = text.Substring(DisplayName.Length + 1);
+                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [PM]{ senderName }: { text.Trim() }", true));
+                    }
+                    else if(senderName == DisplayName)
+                    {
+                        string name = text.Split(' ')[0];
+                        text = text.Substring(name.Length + 1);
+                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [PM]{ senderName } to { name }: { text.Trim() }", false));
                     }
                     break;
                 // Active user return message

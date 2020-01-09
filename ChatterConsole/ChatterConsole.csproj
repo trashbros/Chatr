@@ -10,6 +10,7 @@
     <PackageProjectUrl>https://github.com/trashbros/Chatter</PackageProjectUrl>
     <RepositoryUrl>https://github.com/trashbros/Chatter</RepositoryUrl>
     <NeutralLanguage>en-US</NeutralLanguage>
+    <AssemblyVersion>0.0.0.1</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
