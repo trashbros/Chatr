@@ -41,19 +41,25 @@ namespace ChatterConsole
             }
 
             // Create a new Chatter client
-            var chatterClient = new Chatter.Client(IPAddress.Parse(ipAddress), IPAddress.Parse("239.255.10.11"), 1314);
+            //var chatterClient = new Chatter.Client(IPAddress.Parse(ipAddress), IPAddress.Parse("239.255.10.11"), 1314);
+            var chatterClient = new Chatter.Controller(ipAddress, displayName);
 
             // Attach a message handler
-            chatterClient.MessageReceivedEventHandler += (sender, m) =>
+            //chatterClient.MessageReceivedEventHandler += (sender, m) =>
+            //{
+            //    HandleMessagingCalls(m, displayName);
+            //};
+            chatterClient.MessageDisplayEventHandler += (sender, m) =>
             {
-                HandleMessagingCalls(m, displayName);
+                Console.Write(m);
             };
 
             // Start task to receive messages
-            Task.Run(() =>
-            {
-                chatterClient.StartReceiving();
-            });
+            //Task.Run(() =>
+            //{
+            //    chatterClient.StartReceiving();
+            //});
+            chatterClient.Init();
 
             // Get messages and send them out
             Console.Write("> ");
@@ -67,7 +73,8 @@ namespace ChatterConsole
             {
                 if (!string.IsNullOrEmpty(message))
                 {
-                    chatterClient.Send(displayName + ">" + message);
+                    //chatterClient.Send(displayName + ">" + message);
+                    chatterClient.SendMessage(message);
                 }
 
                 message = Console.ReadLine().Trim();
@@ -78,58 +85,58 @@ namespace ChatterConsole
             };
         }
 
-        static void HandleMessagingCalls(Chatter.MessageReceivedEventArgs m, string displayName)
-        {
-            // Parse out the sender name
-            string senderName = m.Message.Split('>')[0];
-            string text = m.Message.Substring(senderName.Length + 1);
+        //static void HandleMessagingCalls(Chatter.MessageReceivedEventArgs m, string displayName)
+        //{
+        //    // Parse out the sender name
+        //    string senderName = m.Message.Split('>')[0];
+        //    string text = m.Message.Substring(senderName.Length + 1);
 
-            //// Check to see if this is a private message
-            //if (text.StartsWith("/pm "))
-            //{
-            //    // Check to see if this private message is to me
-            //    text = text.Substring(4).Trim();
-            //    if (text.StartsWith(displayName + " "))
-            //    {
-            //        // Display the message
-            //        text = text.Substring(displayName.Length);
-            //        Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
-            //    }
-            //}
-            if(text.StartsWith("/"))
-            {
-                text = text.TrimStart('/');
-                HandleCommandText(text, senderName, displayName);
-            }
-            else
-            {
-                // Display the message
-                Console.Write($"\n< { senderName }: { text }\n> ");
-            }
-        }
+        //    //// Check to see if this is a private message
+        //    //if (text.StartsWith("/pm "))
+        //    //{
+        //    //    // Check to see if this private message is to me
+        //    //    text = text.Substring(4).Trim();
+        //    //    if (text.StartsWith(displayName + " "))
+        //    //    {
+        //    //        // Display the message
+        //    //        text = text.Substring(displayName.Length);
+        //    //        Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
+        //    //    }
+        //    //}
+        //    if(text.StartsWith("/"))
+        //    {
+        //        text = text.TrimStart('/');
+        //        HandleCommandText(text, senderName, displayName);
+        //    }
+        //    else
+        //    {
+        //        // Display the message
+        //        Console.Write($"\n< { senderName }: { text }\n> ");
+        //    }
+        //}
 
-        static void HandleCommandText(string message, string senderName, string displayName)
-        {
-            string command = message.Split(' ')[0];
-            if(command == "pm")
-            {
-                string text = message.Substring(3).Trim();
-                if (text.StartsWith(displayName + " "))
-                {
-                    // Display the message
-                    text = text.Substring(displayName.Length);
-                    Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
-                }
-            }
-            else if(command == "users")
-            {
-                //chatterClient.Send(displayName + ">" + "/userinfo");
-            }
-            else if(command == "userinfo")
-            {
-                Console.Write($"\n[{ senderName } Logged In]\n> ");
-            }
-        }
+        //static void HandleCommandText(string message, string senderName, string displayName)
+        //{
+        //    string command = message.Split(' ')[0];
+        //    if(command == "pm")
+        //    {
+        //        string text = message.Substring(3).Trim();
+        //        if (text.StartsWith(displayName + " "))
+        //        {
+        //            // Display the message
+        //            text = text.Substring(displayName.Length);
+        //            Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
+        //        }
+        //    }
+        //    else if(command == "users")
+        //    {
+        //        //chatterClient.Send(displayName + ">" + "/userinfo");
+        //    }
+        //    else if(command == "userinfo")
+        //    {
+        //        Console.Write($"\n[{ senderName } Logged In]\n> ");
+        //    }
+        //}
 
         static bool IsQuitMessage(string message)
         {
