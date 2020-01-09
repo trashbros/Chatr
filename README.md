@@ -20,9 +20,18 @@ Internal server-less client for communicating between development machines. Curr
 
     `/pm [username] [message]`
 
+- Active User List
+  
+    `/users`
+
+- Help
+
+    `/help` or `/h`
+
+    
+
 
 ## To-Do
-- Issue with messages not recieving/appearing
 - Set up as background console notifications rather than full control app
 - Able to connect in and get notifications on repo pushes
 - Setup a release pipeline

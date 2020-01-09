@@ -51,7 +51,7 @@ namespace ChatterConsole
             //};
             chatterClient.MessageDisplayEventHandler += (sender, m) =>
             {
-                Console.Write(m);
+                Console.Write(m + "\n> ");
             };
 
             // Start task to receive messages
