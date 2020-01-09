@@ -30,12 +30,15 @@ namespace Chatter
 
         string DisplayName;
 
+        List<string> m_onlineUsers;
+
         public event EventHandler<string> MessageDisplayEventHandler;
 
         public Controller(string localIP, string displayName)
         {
             LocalIP = localIP;
             DisplayName = displayName;
+            m_onlineUsers = new List<string>();
         }
 
         public void Init()
@@ -54,6 +57,13 @@ namespace Chatter
             {
                 chatterClient.StartReceiving();
             });
+
+            this.SendMessage("/logon");
+        }
+
+        public void ShutDown()
+        {
+            this.SendMessage("/q");
         }
 
         public void SendMessage(string message)
@@ -108,17 +118,35 @@ namespace Chatter
                         //Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
                     }
                     break;
-                // Active user list request
-                case "users":
-                    chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
-                    break;
+                //// Active user list request
+                //case "users":
+                //    chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
+                //    break;
                 // Active user return message
                 case "userinfo":
                     text = message.Substring(8).Trim();
                     if (text.StartsWith(DisplayName))
                     {
-                        MessageDisplayEventHandler?.Invoke(this, $"\n[{ senderName } Logged In]");
+                        m_onlineUsers.Add(senderName);
+                        //MessageDisplayEventHandler?.Invoke(this, $"\n[{ senderName } Logged In]");
                         //Console.Write($"\n[{ senderName } Logged In]\n> ");
+                    }
+                    break;
+                // User logged off
+                case "logoff":
+                    m_onlineUsers.Remove(senderName);
+                    if (senderName != DisplayName)
+                    {
+                        MessageDisplayEventHandler?.Invoke(this, $"\n< [{ senderName } has logged off!");
+                    }
+                    break;
+                // User logged on
+                case "logon":
+                    m_onlineUsers.Add(senderName);
+                    if (senderName != DisplayName)
+                    {
+                        MessageDisplayEventHandler?.Invoke(this, $"\n< [{ senderName } has logged on!");
+                        chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
                     }
                     break;
                 // Not a valid command
@@ -174,6 +202,21 @@ namespace Chatter
                     helptext += @"The source code can be found at https://github.com/trashbros/Chatter/";
                     helptext += "\n";
                     MessageDisplayEventHandler?.Invoke(this, helptext);
+                    break;
+                // Quit command
+                case "q":
+                case "quit":
+                    chatterClient.Send(DisplayName + ">/logoff");
+                    break;
+                // Active user list request
+                case "users":
+                    string userText = "\nActive users are:\n";
+                    foreach(var user in m_onlineUsers)
+                    {
+                        userText += user + "\n";
+                    }
+                    MessageDisplayEventHandler?.Invoke(this, userText);
+                    //chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
                     break;
                 // Not a valid command string
                 default:

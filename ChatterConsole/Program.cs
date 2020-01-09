@@ -100,6 +100,8 @@ namespace ChatterConsole
                 Console.SetCursorPosition(0, Console.CursorTop);
                 Console.Write("> ");
             };
+
+            //chatterClient.ShutDown();
         }
 
         //static void HandleMessagingCalls(Chatter.MessageReceivedEventArgs m, string displayName)
