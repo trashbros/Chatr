@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+Primary command and message logic handler
+Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -152,7 +169,10 @@ namespace Chatter
                     helptext += "/quit                           Quit the application\n/q\n";
                     helptext += "/users                          Get a listing of users currently connected\n";
                     helptext += "/pm [username] [message]        Message ONLY the specified user.\n";
-                    helptext += "                                Does NOT inform if user not online\n";
+                    helptext += "                                Does NOT inform if user not online\n\n";
+                    helptext += "This software is provided under the GNU AGPL3.0 license.\n";
+                    helptext += @"The source code can be found at https://github.com/trashbros/Chatter/";
+                    helptext += "\n";
                     MessageDisplayEventHandler?.Invoke(this, helptext);
                     break;
                 // Not a valid command string
