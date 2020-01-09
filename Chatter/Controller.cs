@@ -44,7 +44,7 @@ namespace Chatter
         public void Init()
         {
             // Create a new Chatter client
-            chatterClient = new Chatter.Client(IPAddress.Parse(LocalIP), IPAddress.Parse("239.255.10.11"), 1314);
+            chatterClient = new Client(IPAddress.Parse(LocalIP), IPAddress.Parse("239.255.10.11"), 1314);
 
             // Attach a message handler
             chatterClient.MessageReceivedEventHandler += (sender, m) =>
@@ -59,12 +59,15 @@ namespace Chatter
             });
 
             m_onlineUsers.Add(DisplayName);
-            this.SendMessage("/logon");
+
+            System.Threading.Thread.Sleep(2000);
+
+            this.SendMessage("/" + CommandList.LOGON);
         }
 
         public void ShutDown()
         {
-            this.SendMessage("/q");
+            this.SendMessage("/" + CommandList.QUIT);
         }
 
         public void SendMessage(string message)
@@ -80,7 +83,6 @@ namespace Chatter
                 // Send The message
                 chatterClient.Send(DisplayName + ">" + message);
             }
-            //chatterClient.Send(DisplayName + ">" + message);
         }
 
         void HandleMessagingCalls(Chatter.MessageReceivedEventArgs m)
@@ -99,42 +101,34 @@ namespace Chatter
             {
                 // Display the message
                 MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< { senderName }: { text }", (senderName != DisplayName)));
-                //Console.Write($"\n< { senderName }: { text }\n> ");
             }
         }
 
         void HandleIncomingCommandText(string message, string senderName)
         {
             string command = message.Split(' ')[0];
-            switch(command)
+            switch(command.ToLower())
             {
                 // Private message
-                case "pm":
-                    string text = message.Substring(3).Trim();
-                    if (text.StartsWith(DisplayName + " "))
+                case CommandList.PM:
+                    string text = message.Substring(CommandList.PM.Length + 1).Trim();
+                    if (text.StartsWith(DisplayName + " ") || senderName == DisplayName)
                     {
                         // Display the message
                         text = text.Substring(DisplayName.Length);
-                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [PM]{ senderName }: { text.Trim() }",true));
-                        //Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
+                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [PM]{ senderName }: { text.Trim() }", (senderName != DisplayName)));
                     }
                     break;
-                //// Active user list request
-                //case "users":
-                //    chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
-                //    break;
                 // Active user return message
-                case "userinfo":
-                    text = message.Substring(8).Trim();
+                case CommandList.USER_PING:
+                    text = message.Substring(CommandList.USER_PING.Length + 1).Trim();
                     if (text.StartsWith(DisplayName))
                     {
                         m_onlineUsers.Add(senderName);
-                        //MessageDisplayEventHandler?.Invoke(this, $"\n[{ senderName } Logged In]");
-                        //Console.Write($"\n[{ senderName } Logged In]\n> ");
                     }
                     break;
                 // User logged off
-                case "logoff":
+                case CommandList.LOGOFF:
                     if (senderName != DisplayName)
                     {
                         m_onlineUsers.Remove(senderName);
@@ -142,62 +136,35 @@ namespace Chatter
                     }
                     break;
                 // User logged on
-                case "logon":
+                case CommandList.LOGON:
                     if (senderName != DisplayName)
                     {
                         m_onlineUsers.Add(senderName);
                         MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [{ senderName } has logged on!"));
-                        chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
+                        chatterClient.Send(DisplayName + ">/" + CommandList.USER_PING + " " + senderName);
                     }
                     break;
-                // Not a valid command
+                // Not a valid command, just go ahead and display it
                 default:
                     MessageDisplayEventHandler?.Invoke(this, $"\n< { senderName }: /{ message.Trim() }");
                     break;
             }
-            //// Private message
-            //if (command == "pm")
-            //{
-            //    string text = message.Substring(3).Trim();
-            //    if (text.StartsWith(DisplayName + " "))
-            //    {
-            //        // Display the message
-            //        text = text.Substring(DisplayName.Length);
-            //        MessageDisplayEventHandler?.Invoke(this, $"\n< [[PM]{ senderName }: { text.Trim() }]");
-            //        //Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
-            //    }
-            //}
-            //// Active user list request
-            //else if (command == "users")
-            //{
-            //    chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
-            //}
-            //// Active user return message
-            //else if (command == "userinfo")
-            //{
-            //    string text = message.Substring(8).Trim();
-            //    if (text.StartsWith(DisplayName))
-            //    {
-            //        MessageDisplayEventHandler?.Invoke(this, $"\n[{ senderName } Logged In]");
-            //        //Console.Write($"\n[{ senderName } Logged In]\n> ");
-            //    }
-            //}
         }
 
         void HandleOutgoingCommandText(string message)
         {
             string command = message.Split(' ')[0];
-            switch(command)
+            switch(command.ToLower())
             {
                 // Help request
-                case "h":
-                case "help":
+                case CommandList.HELP_S:
+                case CommandList.HELP:
                     // MAke a string with info on all command options
                     string helptext = $"\nYou are currently connected as { DisplayName } at IP { LocalIP } \n Command syntax and their function is listed below:\n\n";
-                    helptext += "/help                           Provides this help documentation\n/h\n";
-                    helptext += "/quit                           Quit the application\n/q\n";
-                    helptext += "/users                          Get a listing of users currently connected\n";
-                    helptext += "/pm [username] [message]        Message ONLY the specified user.\n";
+                    helptext += $"/{CommandList.HELP}                           Provides this help documentation\n/{CommandList.HELP_S}\n";
+                    helptext += $"/{CommandList.QUIT}                           Quit the application\n/{CommandList.QUIT_S}\n";
+                    helptext += $"/{CommandList.USER_LIST}                          Get a listing of users currently connected\n";
+                    helptext += $"/{CommandList.PM} [username] [message]        Message ONLY the specified user.\n";
                     helptext += "                                Does NOT inform if user not online\n\n";
                     helptext += "This software is provided under the GNU AGPL3.0 license.\n";
                     helptext += @"The source code can be found at https://github.com/trashbros/Chatter/";
@@ -205,19 +172,18 @@ namespace Chatter
                     MessageDisplayEventHandler?.Invoke(this, helptext);
                     break;
                 // Quit command
-                case "q":
-                case "quit":
-                    chatterClient.Send(DisplayName + ">/logoff");
+                case CommandList.QUIT_S:
+                case CommandList.QUIT:
+                    chatterClient.Send(DisplayName + ">/" + CommandList.LOGOFF);
                     break;
                 // Active user list request
-                case "users":
+                case CommandList.USER_LIST:
                     string userText = "\nActive users are:\n";
                     foreach(var user in m_onlineUsers)
                     {
                         userText += user + "\n";
                     }
                     MessageDisplayEventHandler?.Invoke(this, userText);
-                    //chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
                     break;
                 // Not a valid command string
                 default:
@@ -225,23 +191,6 @@ namespace Chatter
                     chatterClient.Send(DisplayName + ">/" + message);
                     break;
             }
-
-            //if(command == "help" || command == "h")
-            //{
-            //    // MAke a string with info on all command options
-            //    string helptext = $"You are currently connected as { DisplayName } at IP { LocalIP } \n Command syntax and their function is listed below:\n\n";
-            //    helptext += "/help                           Provides this help documentation\n/h\n";
-            //    helptext += "/quit                           Quit the application\n/q\n";
-            //    helptext += "/users                          Get a listing of users currently connected\n";
-            //    helptext += "/pm [username] [message]        Message ONLY the specified user.";
-            //    helptext += "                                Does NOT inform if user not online";
-            //    MessageDisplayEventHandler?.Invoke(this, helptext);
-            //}
-            //else
-            //{
-
-            //}
-
         }
 
         private string FormatMessageText(string message, bool notify = false)
