@@ -25,6 +25,10 @@ namespace ChatterConsole
     {
         static void Main(string[] args)
         {
+            // Print the version number on startup
+            Console.Write(string.Format("You are running version {0} of Chatter!\n",
+                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()));
+
             // Get the local IP Address to use
             string ipAddress = "";
             if (args.Length > 0)

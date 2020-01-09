@@ -195,7 +195,7 @@ namespace Chatter
 
         private string FormatMessageText(string message, bool notify = false)
         {
-            string formattedString = message + "\n";
+            string formattedString = message + " \n";
 
             if(notify)
             {
