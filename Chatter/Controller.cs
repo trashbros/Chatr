@@ -58,6 +58,7 @@ namespace Chatter
                 chatterClient.StartReceiving();
             });
 
+            m_onlineUsers.Add(DisplayName);
             this.SendMessage("/logon");
         }
 
@@ -97,7 +98,7 @@ namespace Chatter
             else
             {
                 // Display the message
-                MessageDisplayEventHandler?.Invoke(this, $"\n< { senderName }: { text }");
+                MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< { senderName }: { text }", (senderName != DisplayName)));
                 //Console.Write($"\n< { senderName }: { text }\n> ");
             }
         }
@@ -114,7 +115,7 @@ namespace Chatter
                     {
                         // Display the message
                         text = text.Substring(DisplayName.Length);
-                        MessageDisplayEventHandler?.Invoke(this, $"\n< [[PM]{ senderName }: { text.Trim() }]");
+                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [PM]{ senderName }: { text.Trim() }",true));
                         //Console.Write($"\n< [[PM]{ senderName }: { text.Trim() }]\n> ");
                     }
                     break;
@@ -134,18 +135,18 @@ namespace Chatter
                     break;
                 // User logged off
                 case "logoff":
-                    m_onlineUsers.Remove(senderName);
                     if (senderName != DisplayName)
                     {
-                        MessageDisplayEventHandler?.Invoke(this, $"\n< [{ senderName } has logged off!");
+                        m_onlineUsers.Remove(senderName);
+                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [{ senderName } has logged off!"));
                     }
                     break;
                 // User logged on
                 case "logon":
-                    m_onlineUsers.Add(senderName);
                     if (senderName != DisplayName)
                     {
-                        MessageDisplayEventHandler?.Invoke(this, $"\n< [{ senderName } has logged on!");
+                        m_onlineUsers.Add(senderName);
+                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [{ senderName } has logged on!"));
                         chatterClient.Send(DisplayName + ">" + "/userinfo " + senderName);
                     }
                     break;
@@ -240,6 +241,19 @@ namespace Chatter
             //{
 
             //}
+
+        }
+
+        private string FormatMessageText(string message, bool notify = false)
+        {
+            string formattedString = message + "\n";
+
+            if(notify)
+            {
+                formattedString = "\x7" + formattedString;
+            }
+
+            return formattedString;
         }
     }
 }
