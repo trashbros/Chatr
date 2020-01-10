@@ -193,14 +193,14 @@ namespace Chatter
                 case CommandList.HELP:
                     // MAke a string with info on all command options
                     string helptext = $"\nYou are currently connected as { m_displayName } at IP { m_localIP } \n Command syntax and their function is listed below:\n\n";
-                    helptext += $"/{CommandList.HELP}                           Provides this help documentation\n/{CommandList.HELP_S}\n";
-                    helptext += $"/{CommandList.QUIT}                           Quit the application\n/{CommandList.QUIT_S}\n";
-                    helptext += $"/{CommandList.USER_LIST}                          Get a listing of users currently connected\n";
-                    helptext += $"/{CommandList.PM} [username] [message]        Message ONLY the specified user.\n";
-                    helptext += "                                Does NOT inform if user not online\n";
-                    helptext += $"/{CommandList.CHANGE_NAME} [username]             Changes your currently display name\n";
-                    helptext += $"/{CommandList.CHANGE_MULTICAST} [IP address]               Changes to a different multicast group.\n";
-                    helptext += $"/{CommandList.CHANGE_PORT} [Port number]                   Changes to a different port on the current multicast IP address\n";
+                    helptext += $"/{CommandList.HELP}       or      /{CommandList.HELP_S}\n               Provides this help documentation\n";
+                    helptext += $"/{CommandList.QUIT}       or      /{CommandList.QUIT_S}\n               Quit the application\n";
+                    helptext += $"/{CommandList.USER_LIST}\n               Get a listing of users currently connected\n";
+                    helptext += $"/{CommandList.PM} [username] [message]\n               Message ONLY the specified user.\n";
+                    helptext += "               Does NOT inform if user not online\n";
+                    helptext += $"/{CommandList.CHANGE_NAME} [username]\n               Changes your currently display name\n";
+                    helptext += $"/{CommandList.CHANGE_MULTICAST} [IP address]\n               Changes to a different multicast group.\n";
+                    helptext += $"/{CommandList.CHANGE_PORT} [Port number]\n               Changes to a different port on the current multicast IP address\n";
                     helptext += "\nThis software is provided under the GNU AGPL3.0 license.\n";
                     helptext += @"The source code can be found at https://github.com/trashbros/Chatter/";
                     helptext += "\n";
