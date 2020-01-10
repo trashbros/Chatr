@@ -116,7 +116,7 @@ namespace Chatter
             else
             {
                 // Display the message
-                DisplayMessage(FormatMessageText($"\n< { senderName }: { text }", (senderName != m_displayName)));
+                DisplayMessage(FormatMessageText($"< { senderName }: { text }", (senderName != m_displayName)));
             }
         }
 
@@ -132,13 +132,13 @@ namespace Chatter
                     {
                         // Display the message
                         text = text.Substring(m_displayName.Length + 1);
-                        DisplayMessage(FormatMessageText($"\n< [PM]{ senderName }: { text.Trim() }", true));
+                        DisplayMessage(FormatMessageText($"< [PM]{ senderName }: { text.Trim() }", true));
                     }
                     else if(senderName == m_displayName)
                     {
                         string name = text.Split(' ')[0];
                         text = text.Substring(name.Length + 1);
-                        DisplayMessage(FormatMessageText($"\n< [PM]{ senderName } to { name }: { text.Trim() }", false));
+                        DisplayMessage(FormatMessageText($"< [PM]{ senderName } to { name }: { text.Trim() }", false));
                     }
                     break;
                 // Active user return message
@@ -154,7 +154,7 @@ namespace Chatter
                     if (senderName != m_displayName)
                     {
                         m_onlineUsers.Remove(senderName);
-                        DisplayMessage(FormatMessageText($"\n< [{ senderName } has logged off!]"));
+                        DisplayMessage(FormatMessageText($"< [{ senderName } has logged off!]"));
                     }
                     break;
                 // User logged on
@@ -162,7 +162,7 @@ namespace Chatter
                     if (senderName != m_displayName)
                     {
                         m_onlineUsers.Add(senderName);
-                        DisplayMessage(FormatMessageText($"\n< [{ senderName } has logged on!]"));
+                        DisplayMessage(FormatMessageText($"< [{ senderName } has logged on!]"));
                         chatterClient.Send(m_displayName + ">/" + CommandList.USER_PING + " " + senderName);
                     }
                     break;
@@ -173,12 +173,12 @@ namespace Chatter
                     {
                         m_onlineUsers.Remove(senderName);
                         m_onlineUsers.Add(newName);
-                        DisplayMessage(FormatMessageText($"\n< [{ senderName } has changed to {newName}]"));
+                        DisplayMessage(FormatMessageText($"< [{ senderName } has changed to {newName}]"));
                     }
                     break;
                 // Not a valid command, just go ahead and display it
                 default:
-                    DisplayMessage($"\n< { senderName }: /{ message.Trim() }");
+                    DisplayMessage($"< { senderName }: /{ message.Trim() }");
                     break;
             }
         }
@@ -213,7 +213,7 @@ namespace Chatter
                     break;
                 // Active user list request
                 case CommandList.USER_LIST:
-                    string userText = "\nActive users are:\n";
+                    string userText = "Active users are:\n";
                     foreach(var user in m_onlineUsers)
                     {
                         userText += user + "\n";
@@ -231,7 +231,7 @@ namespace Chatter
                     var newIP = message.Substring(CommandList.CHANGE_MULTICAST.Length + 1);
                     if (!IsValidIP(newIP))
                     {
-                        DisplayMessage("\nMulticast IP is not valid\n");
+                        DisplayMessage("Multicast IP is not valid\n");
                     }
                     else
                     {
@@ -245,7 +245,7 @@ namespace Chatter
                     int newPort = 0;
                     if(!IsValidPort(portString, out newPort))
                     {
-                        DisplayMessage("\nInvalid port number provided!");
+                        DisplayMessage("Invalid port number provided!");
                     }
                     else
                     {
@@ -278,13 +278,13 @@ namespace Chatter
             // Check that our local IP is good
             if(!IsValidIP(m_localIP))
             {
-                DisplayMessage("\nInvalid client IP provided!\n");
+                DisplayMessage("Invalid client IP provided!\n");
                 return;
             }
             // Check that our multicast IP is good
             if(!IsValidIP(m_multicastIP))
             {
-                DisplayMessage("\nInvalid multicast IP provided!\n");
+                DisplayMessage("Invalid multicast IP provided!\n");
                 return;
             }
 
@@ -294,7 +294,7 @@ namespace Chatter
                 
             }
             ConnectClient();
-            DisplayMessage($"\n**************\nJoined Multicast Group:\nIP: {m_multicastIP}\nPort: {m_port.ToString()}\n**************\n");
+            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {m_multicastIP}\nPort: {m_port.ToString()}\n**************\n");
         }
 
         private bool IsValidIP(string ipAdress)

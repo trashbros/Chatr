@@ -16,13 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
-using System.Net;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ChatterConsole
 {
     class Program
     {
+        static string incommingMessage = string.Empty;
+        static List<string> messageHistory = new List<string>();
+        static int historyIndex = -1;
+
         static void Main(string[] args)
         {
             // Print the version number on startup
@@ -39,7 +42,7 @@ namespace ChatterConsole
             {
                 Console.Write("Enter the local IP address to use: ");
                 ipAddress = Console.ReadLine();
-                while(string.IsNullOrEmpty(ipAddress))
+                while (string.IsNullOrEmpty(ipAddress))
                 {
                     ipAddress = Console.ReadLine();
                 }
@@ -51,7 +54,7 @@ namespace ChatterConsole
             {
                 displayName = args[1];
             }
-            if(string.IsNullOrEmpty(displayName))
+            if (string.IsNullOrEmpty(displayName))
             {
                 Console.Write("Enter your display name: ");
                 displayName = Console.ReadLine();
@@ -62,23 +65,22 @@ namespace ChatterConsole
             }
 
             // Create a new Chatter client
-            var chatterClient = new Chatter.Controller(ipAddress, displayName);
+            var chatterClient = new Chatter.Controller(ipAddress, displayName, port: "1314");
 
             // Attach a message display handler
             chatterClient.MessageDisplayEventHandler += (sender, m) =>
             {
-                Console.Write(m + "> ");
+                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.Write(new string(' ', Console.WindowWidth - 1));
+                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.Write(m + "\n> " + incommingMessage);
             };
 
             chatterClient.Init();
 
             // Get messages and send them out
             Console.Write("> ");
-            string message = Console.ReadLine().Trim();
-            Console.SetCursorPosition(0, Console.CursorTop - 1);
-            Console.Write(new string(' ', Console.WindowWidth - 1));
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write("> ");
+            string message = ReadMessage();
 
             while (!IsQuitMessage(message))
             {
@@ -87,14 +89,63 @@ namespace ChatterConsole
                     chatterClient.SendMessage(message);
                 }
 
-                message = Console.ReadLine().Trim();
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-                Console.Write(new string(' ', Console.WindowWidth - 1));
-                Console.SetCursorPosition(0, Console.CursorTop);
-                Console.Write("> ");
+                message = ReadMessage();
             };
 
             chatterClient.ShutDown();
+        }
+
+        private static string ReadMessage()
+        {
+            incommingMessage = string.Empty;
+            var key = Console.ReadKey(true);
+            while( key.Key != ConsoleKey.Enter)
+            {
+                if (key.Key == ConsoleKey.Backspace && incommingMessage.Length > 0)
+                {
+                    incommingMessage = incommingMessage[0..^1];
+                }
+                else if (key.Key == ConsoleKey.Escape)
+                {
+                    incommingMessage = "";
+                    historyIndex = -1;
+                }
+                else if (!char.IsControl(key.KeyChar) && incommingMessage.Length < 80)
+                {
+                    incommingMessage += key.KeyChar;
+                }
+                else if (key.Key == ConsoleKey.UpArrow)
+                {
+                    if (messageHistory.Count > 0 && historyIndex < messageHistory.Count - 1)
+                    {
+                        historyIndex++;
+                        incommingMessage = messageHistory[historyIndex];
+                    }
+                }
+                else if (key.Key == ConsoleKey.DownArrow)
+                {
+                    if (messageHistory.Count > 0 && historyIndex > 0)
+                    {
+                        historyIndex--;
+                        incommingMessage = messageHistory[historyIndex];
+                    }
+                }
+
+                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.Write(new string(' ', Console.WindowWidth - 1));
+                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.Write("> " + incommingMessage);
+
+                key = Console.ReadKey(true);
+            }
+
+            if (!string.IsNullOrEmpty(incommingMessage) && !messageHistory.Contains(incommingMessage))
+            {
+                messageHistory.Add(incommingMessage);
+            }
+            historyIndex = -1;
+
+            return incommingMessage;
         }
 
         static bool IsQuitMessage(string message)
