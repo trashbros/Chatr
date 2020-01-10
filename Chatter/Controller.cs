@@ -197,8 +197,11 @@ namespace Chatter
                     helptext += $"/{CommandList.QUIT}                           Quit the application\n/{CommandList.QUIT_S}\n";
                     helptext += $"/{CommandList.USER_LIST}                          Get a listing of users currently connected\n";
                     helptext += $"/{CommandList.PM} [username] [message]        Message ONLY the specified user.\n";
-                    helptext += "                                Does NOT inform if user not online\n\n";
-                    helptext += "This software is provided under the GNU AGPL3.0 license.\n";
+                    helptext += "                                Does NOT inform if user not online\n";
+                    helptext += $"/{CommandList.CHANGE_NAME} [username]             Changes your currently display name\n";
+                    helptext += $"/{CommandList.CHANGE_MULTICAST} [IP address]               Changes to a different multicast group.\n";
+                    helptext += $"/{CommandList.CHANGE_PORT} [Port number]                   Changes to a different port on the current multicast IP address\n";
+                    helptext += "\nThis software is provided under the GNU AGPL3.0 license.\n";
                     helptext += @"The source code can be found at https://github.com/trashbros/Chatter/";
                     helptext += "\n";
                     DisplayMessage(helptext);
