@@ -40,6 +40,8 @@ namespace Chatter
 
         public event EventHandler<MessageReceivedEventArgs> MessageReceivedEventHandler;
 
+        private bool m_isReceiving = false;
+
         public Client(IPAddress localIP, IPAddress multicastIP, int port)
         {
             LocalIP = localIP;
@@ -49,6 +51,7 @@ namespace Chatter
 
         public void StartReceiving()
         {
+            m_isReceiving = true;
             using (var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -60,7 +63,7 @@ namespace Chatter
 
                 try
                 {
-                    while (true)
+                    while (m_isReceiving)
                     {
                         byte[] datagram = new byte[65536];
                         int length = sock.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
@@ -75,6 +78,12 @@ namespace Chatter
                     Console.WriteLine(e);
                 }
             }
+            m_isReceiving = false;
+        }
+
+        public void Dispose()
+        {
+            m_isReceiving = false;
         }
 
         public void Send(string message)

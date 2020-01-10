@@ -82,6 +82,8 @@ namespace Chatter
         public void ShutDown()
         {
             this.SendMessage("/" + CommandList.QUIT);
+            chatterClient?.Dispose();
+            chatterClient = null;
         }
 
         public void SendMessage(string message)
@@ -286,7 +288,7 @@ namespace Chatter
             if (chatterClient != null)
             {
                 ShutDown();
-                chatterClient = null;
+                
             }
             ConnectClient();
             DisplayMessage($"\n**************\nJoined Multicast Group:\nIP: {m_multicastIP}\nPort: {m_port.ToString()}\n**************\n");
