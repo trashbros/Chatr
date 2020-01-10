@@ -99,8 +99,7 @@ namespace ChatterConsole
 
         static bool IsQuitMessage(string message)
         {
-            string text = message.ToLower();
-            text.TrimStart('/');
+            string text = message.ToLower().TrimStart('/');
             return (text == Chatter.CommandList.QUIT || text == Chatter.CommandList.QUIT_S);
         }
     }
