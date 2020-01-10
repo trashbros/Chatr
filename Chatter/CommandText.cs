@@ -15,5 +15,9 @@ namespace Chatter
         public const string LOGOFF = "logoff";
         public const string LOGON = "logon";
         public const string USER_LIST = "users";
+        public const string CHANGE_NAME = "name";
+        public const string NAME_CHANGED = "namechange";
+        public const string CHANGE_MULTICAST = "multicast";
+        public const string CHANGE_PORT = "port";
     }
 }

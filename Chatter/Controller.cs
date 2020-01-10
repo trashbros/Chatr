@@ -26,25 +26,39 @@ namespace Chatter
     {
         Client chatterClient;
 
-        string LocalIP;
+        string m_localIP;
 
-        string DisplayName;
+        string m_displayName;
+
+        string m_multicastIP;
+        int m_port;
 
         List<string> m_onlineUsers;
 
         public event EventHandler<string> MessageDisplayEventHandler;
 
-        public Controller(string localIP, string displayName)
+        public Controller(string localIP, string displayName, string multicastIP = "239.255.10.11", string port = "1314")
         {
-            LocalIP = localIP;
-            DisplayName = displayName;
+            m_localIP = localIP;
+            m_displayName = displayName;
+            m_multicastIP = multicastIP;
+            m_port = 0;
+            if(!IsValidPort(port, out m_port))
+            {
+                m_port = 1314;
+            }
             m_onlineUsers = new List<string>();
         }
 
         public void Init()
         {
+            NewClientConnection();
+        }
+
+        private void ConnectClient()
+        {
             // Create a new Chatter client
-            chatterClient = new Client(IPAddress.Parse(LocalIP), IPAddress.Parse("239.255.10.11"), 1314);
+            chatterClient = new Client(IPAddress.Parse(m_localIP), IPAddress.Parse(m_multicastIP), m_port);
 
             // Attach a message handler
             chatterClient.MessageReceivedEventHandler += (sender, m) =>
@@ -58,7 +72,7 @@ namespace Chatter
                 chatterClient.StartReceiving();
             });
 
-            m_onlineUsers.Add(DisplayName);
+            m_onlineUsers.Add(m_displayName);
 
             System.Threading.Thread.Sleep(2000);
 
@@ -81,7 +95,7 @@ namespace Chatter
             else
             {
                 // Send The message
-                chatterClient.Send(DisplayName + ">" + message);
+                chatterClient.Send(m_displayName + ">" + message);
             }
         }
 
@@ -100,7 +114,7 @@ namespace Chatter
             else
             {
                 // Display the message
-                MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< { senderName }: { text }", (senderName != DisplayName)));
+                DisplayMessage(FormatMessageText($"\n< { senderName }: { text }", (senderName != m_displayName)));
             }
         }
 
@@ -112,47 +126,57 @@ namespace Chatter
                 // Private message
                 case CommandList.PM:
                     string text = message.Substring(CommandList.PM.Length + 1).Trim();
-                    if (text.StartsWith(DisplayName + " ") )
+                    if (text.StartsWith(m_displayName + " ") )
                     {
                         // Display the message
-                        text = text.Substring(DisplayName.Length + 1);
-                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [PM]{ senderName }: { text.Trim() }", true));
+                        text = text.Substring(m_displayName.Length + 1);
+                        DisplayMessage(FormatMessageText($"\n< [PM]{ senderName }: { text.Trim() }", true));
                     }
-                    else if(senderName == DisplayName)
+                    else if(senderName == m_displayName)
                     {
                         string name = text.Split(' ')[0];
                         text = text.Substring(name.Length + 1);
-                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [PM]{ senderName } to { name }: { text.Trim() }", false));
+                        DisplayMessage(FormatMessageText($"\n< [PM]{ senderName } to { name }: { text.Trim() }", false));
                     }
                     break;
                 // Active user return message
                 case CommandList.USER_PING:
                     text = message.Substring(CommandList.USER_PING.Length + 1).Trim();
-                    if (text.StartsWith(DisplayName))
+                    if (text.StartsWith(m_displayName))
                     {
                         m_onlineUsers.Add(senderName);
                     }
                     break;
                 // User logged off
                 case CommandList.LOGOFF:
-                    if (senderName != DisplayName)
+                    if (senderName != m_displayName)
                     {
                         m_onlineUsers.Remove(senderName);
-                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [{ senderName } has logged off!"));
+                        DisplayMessage(FormatMessageText($"\n< [{ senderName } has logged off!]"));
                     }
                     break;
                 // User logged on
                 case CommandList.LOGON:
-                    if (senderName != DisplayName)
+                    if (senderName != m_displayName)
                     {
                         m_onlineUsers.Add(senderName);
-                        MessageDisplayEventHandler?.Invoke(this, FormatMessageText($"\n< [{ senderName } has logged on!"));
-                        chatterClient.Send(DisplayName + ">/" + CommandList.USER_PING + " " + senderName);
+                        DisplayMessage(FormatMessageText($"\n< [{ senderName } has logged on!]"));
+                        chatterClient.Send(m_displayName + ">/" + CommandList.USER_PING + " " + senderName);
+                    }
+                    break;
+                // Notified a user changed their display name
+                case CommandList.NAME_CHANGED:
+                    string newName = message.Substring(CommandList.NAME_CHANGED.Length + 1);
+                    if ( senderName != m_displayName && newName != m_displayName)
+                    {
+                        m_onlineUsers.Remove(senderName);
+                        m_onlineUsers.Add(newName);
+                        DisplayMessage(FormatMessageText($"\n< [{ senderName } has changed to {newName}]"));
                     }
                     break;
                 // Not a valid command, just go ahead and display it
                 default:
-                    MessageDisplayEventHandler?.Invoke(this, $"\n< { senderName }: /{ message.Trim() }");
+                    DisplayMessage($"\n< { senderName }: /{ message.Trim() }");
                     break;
             }
         }
@@ -166,7 +190,7 @@ namespace Chatter
                 case CommandList.HELP_S:
                 case CommandList.HELP:
                     // MAke a string with info on all command options
-                    string helptext = $"\nYou are currently connected as { DisplayName } at IP { LocalIP } \n Command syntax and their function is listed below:\n\n";
+                    string helptext = $"\nYou are currently connected as { m_displayName } at IP { m_localIP } \n Command syntax and their function is listed below:\n\n";
                     helptext += $"/{CommandList.HELP}                           Provides this help documentation\n/{CommandList.HELP_S}\n";
                     helptext += $"/{CommandList.QUIT}                           Quit the application\n/{CommandList.QUIT_S}\n";
                     helptext += $"/{CommandList.USER_LIST}                          Get a listing of users currently connected\n";
@@ -175,12 +199,12 @@ namespace Chatter
                     helptext += "This software is provided under the GNU AGPL3.0 license.\n";
                     helptext += @"The source code can be found at https://github.com/trashbros/Chatter/";
                     helptext += "\n";
-                    MessageDisplayEventHandler?.Invoke(this, helptext);
+                    DisplayMessage(helptext);
                     break;
                 // Quit command
                 case CommandList.QUIT_S:
                 case CommandList.QUIT:
-                    chatterClient.Send(DisplayName + ">/" + CommandList.LOGOFF);
+                    chatterClient.Send(m_displayName + ">/" + CommandList.LOGOFF);
                     break;
                 // Active user list request
                 case CommandList.USER_LIST:
@@ -189,12 +213,45 @@ namespace Chatter
                     {
                         userText += user + "\n";
                     }
-                    MessageDisplayEventHandler?.Invoke(this, userText);
+                    DisplayMessage(userText);
+                    break;
+                // Change your display name
+                case CommandList.CHANGE_NAME:
+                    string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1);
+                    chatterClient.Send(m_displayName + ">/" + CommandList.NAME_CHANGED + " " + newName);
+                    m_displayName = newName;
+                    break;
+                // Change your multicast ip address
+                case CommandList.CHANGE_MULTICAST:
+                    var newIP = message.Substring(CommandList.CHANGE_MULTICAST.Length + 1);
+                    if (!IsValidIP(newIP))
+                    {
+                        DisplayMessage("\nMulticast IP is not valid\n");
+                    }
+                    else
+                    {
+                        m_multicastIP = newIP;
+                        NewClientConnection();
+                    }
+                    break;
+                // Change your connection port
+                case CommandList.CHANGE_PORT:
+                    var portString = message.Substring(CommandList.CHANGE_PORT.Length + 1);
+                    int newPort = 0;
+                    if(!IsValidPort(portString, out newPort))
+                    {
+                        DisplayMessage("\nInvalid port number provided!");
+                    }
+                    else
+                    {
+                        m_port = newPort;
+                        NewClientConnection();
+                    }
                     break;
                 // Not a valid command string
                 default:
                     // Send The message
-                    chatterClient.Send(DisplayName + ">/" + message);
+                    chatterClient.Send(m_displayName + ">/" + message);
                     break;
             }
         }
@@ -209,6 +266,59 @@ namespace Chatter
             }
 
             return formattedString;
+        }
+
+        private void NewClientConnection()
+        {
+            // Check that our local IP is good
+            if(!IsValidIP(m_localIP))
+            {
+                DisplayMessage("\nInvalid client IP provided!\n");
+                return;
+            }
+            // Check that our multicast IP is good
+            if(!IsValidIP(m_multicastIP))
+            {
+                DisplayMessage("\nInvalid multicast IP provided!\n");
+                return;
+            }
+
+            if (chatterClient != null)
+            {
+                ShutDown();
+                chatterClient = null;
+            }
+            ConnectClient();
+            DisplayMessage($"\n**************\nJoined Multicast Group:\nIP: {m_multicastIP}\nPort: {m_port.ToString()}\n**************\n");
+        }
+
+        private bool IsValidIP(string ipAdress)
+        {
+            IPAddress testAddr;
+            if(!IPAddress.TryParse(ipAdress,out testAddr))
+            { return false; }
+            return true;
+        }
+
+        private bool IsValidPort(string portString, out int portNum)
+        {
+            portNum = 0;
+            if(!Int32.TryParse(portString, out portNum))
+            {
+                return false;
+            }
+
+            if(portNum < 0 || portNum > 65535)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void DisplayMessage(string message)
+        {
+            MessageDisplayEventHandler?.Invoke(this, message);
         }
     }
 }
