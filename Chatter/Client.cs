@@ -56,6 +56,10 @@ namespace Chatter
         public IPAddress LocalIP { get; }
         public IPAddress MulticastIP { get; }
         public int Port { get; }
+        public bool ReceiveStarted
+        {
+            get => _receiveSocket != null;
+        }
         #endregion
 
         #region Events
