@@ -22,34 +22,6 @@ using System.Text;
 
 namespace Chatter
 {
-    public class MessageReceivedEventArgs : EventArgs
-    {
-        public string Message { get; set; }
-        public IPAddress SenderIP { get; set; }
-        public MessageReceivedEventArgs(string message, IPAddress senderIP)
-        {
-            Message = message;
-            SenderIP = senderIP;
-        }
-    }
-
-    public class AlreadyReceivingException : Exception
-    {
-        public AlreadyReceivingException()
-        {
-        }
-
-        public AlreadyReceivingException(string message)
-            : base(message)
-        {
-        }
-
-        public AlreadyReceivingException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
-    }
-
     public class Client : IDisposable
     {
         #region Properties
@@ -82,7 +54,7 @@ namespace Chatter
         {
             if (_receiveSocket != null)
             {
-                throw new AlreadyReceivingException();
+                throw new ClientAlreadyReceivingException();
             }
 
             try
