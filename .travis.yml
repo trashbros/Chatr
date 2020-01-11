@@ -1,0 +1,6 @@
+language: csharp
+solution: Chatter.sln
+mono: none
+dotnet: 2.0
+script:
+  - dotnet restore
