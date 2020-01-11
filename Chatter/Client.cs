@@ -105,6 +105,7 @@ namespace Chatter
             }
             catch (SocketException e)
             {
+                StopReceiving();
                 Console.WriteLine(e);
             }
         }
