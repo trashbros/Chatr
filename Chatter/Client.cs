@@ -19,6 +19,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Chatter
 {
@@ -50,7 +51,7 @@ namespace Chatter
             Port = port;
         }
 
-        public void StartReceiving()
+        public async Task StartReceiving()
         {
             if (_receiveSocket != null)
             {
@@ -68,15 +69,25 @@ namespace Chatter
                     IPEndPoint remoteIPEndPoint = new IPEndPoint(MulticastIP, 0);
                     EndPoint remoteEndPoint = remoteIPEndPoint;
 
-                    while (true)
+                    await Task.Run(() =>
                     {
-                        byte[] datagram = new byte[65536];
-                        int length = _receiveSocket.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
-                        Array.Resize(ref datagram, length);
+                        try
+                        {
+                            while (true)
+                            {
+                                byte[] datagram = new byte[65536];
+                                int length = _receiveSocket.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
+                                Array.Resize(ref datagram, length);
 
-                        string message = Encoding.UTF8.GetString(Convert.FromBase64String(Encoding.UTF8.GetString(datagram)));
-                        MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
-                    }
+                                string message = Encoding.UTF8.GetString(Convert.FromBase64String(Encoding.UTF8.GetString(datagram)));
+                                MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
+                            }
+                        }
+                        catch (SocketException)
+                        {
+                            StopReceiving();
+                        }
+                    });
                 }
             }
             catch (SocketException e)

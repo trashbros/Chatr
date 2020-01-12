@@ -67,10 +67,7 @@ namespace Chatter
             };
 
             // Start task to receive messages
-            System.Threading.Tasks.Task.Run(() =>
-            {
-                chatterClient.StartReceiving();
-            });
+            _ = chatterClient.StartReceiving();
 
             m_onlineUsers.Add(m_displayName);
 
