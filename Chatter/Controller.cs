@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Globalization;
 
 namespace Chatter
 {
@@ -74,7 +75,7 @@ namespace Chatter
         public void SendMessage(string message)
         {
             // Check to see if this is a command message
-            if (message.StartsWith("/"))
+            if (message.StartsWith("/", StringComparison.Ordinal))
             {
                 message = message.TrimStart('/');
                 HandleOutgoingCommandText(message);
@@ -134,7 +135,7 @@ namespace Chatter
             string text = m.Message.Substring(senderName.Length + 1);
 
             // Check to see if this is a command message
-            if (text.StartsWith("/"))
+            if (text.StartsWith("/", StringComparison.Ordinal))
             {
                 // Trim off the starting slash then try to parse the command
                 text = text.TrimStart('/');
@@ -160,13 +161,13 @@ namespace Chatter
                 // Private message
                 case CommandList.PM:
                     string text = message.Substring(CommandList.PM.Length + 1).Trim();
-                    if (text.StartsWith(m_displayName + " ") )
+                    if (text.StartsWith(m_displayName + " ", StringComparison.Ordinal) )
                     {
                         // Display the message
                         text = text.Substring(m_displayName.Length + 1);
                         DisplayMessage(FormatMessageText($"[PM]{ senderName }: { text.Trim() }", true));
                     }
-                    else if(senderName == m_displayName)
+                    else if(string.Compare(senderName, m_displayName, StringComparison.Ordinal) == 0)
                     {
                         string name = text.Split(' ')[0];
                         text = text.Substring(name.Length + 1);
@@ -176,14 +177,14 @@ namespace Chatter
                 // Active user return message
                 case CommandList.USER_PING:
                     text = message.Substring(CommandList.USER_PING.Length + 1).Trim();
-                    if (text.StartsWith(m_displayName))
+                    if (text.StartsWith(m_displayName, StringComparison.Ordinal))
                     {
                         m_onlineUsers.Add(senderName);
                     }
                     break;
                 // User logged off
                 case CommandList.LOGOFF:
-                    if (senderName != m_displayName)
+                    if (string.Compare(senderName, m_displayName, StringComparison.Ordinal) != 0)
                     {
                         m_onlineUsers.Remove(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged off!]"));
@@ -191,7 +192,7 @@ namespace Chatter
                     break;
                 // User logged on
                 case CommandList.LOGON:
-                    if (senderName != m_displayName)
+                    if (string.Compare(senderName, m_displayName, StringComparison.Ordinal) != 0)
                     {
                         m_onlineUsers.Add(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"));
@@ -200,8 +201,8 @@ namespace Chatter
                     break;
                 // Notified a user changed their display name
                 case CommandList.NAME_CHANGED:
-                    string newName = message.Substring(CommandList.NAME_CHANGED.Length + 1);
-                    if ( senderName != m_displayName && newName != m_displayName)
+                    string newName = message.Substring(CommandList.NAME_CHANGED.Length + 1).Trim();
+                    if (string.Compare(senderName, m_displayName, StringComparison.Ordinal) != 0 && string.Compare(newName, m_displayName, StringComparison.Ordinal) != 0)
                     {
                         m_onlineUsers.Remove(senderName);
                         m_onlineUsers.Add(newName);
