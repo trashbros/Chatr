@@ -31,8 +31,8 @@ namespace ChatterConsole
         static void Main(string[] args)
         {
             // Print the version number on startup
-            Console.Write(string.Format("You are running version {0} of Chatter!\n",
-                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()));
+            string assVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Console.Write($"You are running version {assVersion} of Chatter!\n");
 
             // Get the local IP Address to use
             string ipAddress = "";
@@ -174,7 +174,7 @@ namespace ChatterConsole
 
         static bool IsQuitMessage(string message)
         {
-            string text = message.ToLower().TrimStart('/');
+            string text = message.ToLower(System.Globalization.CultureInfo.CurrentCulture).TrimStart('/');
             return (text == Chatter.CommandList.QUIT || text == Chatter.CommandList.QUIT_S);
         }
     }
