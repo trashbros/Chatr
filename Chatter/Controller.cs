@@ -83,7 +83,7 @@ namespace Chatter
             else
             {
                 // Send The message
-                chatterClient.Send(m_displayName + ">" + message);
+                chatterClient?.Send(m_displayName + ">" + message);
             }
         }
 
@@ -196,7 +196,7 @@ namespace Chatter
                     {
                         m_onlineUsers.Add(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"));
-                        chatterClient.Send(m_displayName + ">/" + CommandList.USER_PING + " " + senderName);
+                        chatterClient?.Send(m_displayName + ">/" + CommandList.USER_PING + " " + senderName);
                     }
                     break;
                 // Notified a user changed their display name
@@ -246,7 +246,7 @@ namespace Chatter
                 // Quit command
                 case CommandList.QUIT_S:
                 case CommandList.QUIT:
-                    chatterClient.Send(m_displayName + ">/" + CommandList.LOGOFF);
+                    chatterClient?.Send(m_displayName + ">/" + CommandList.LOGOFF);
                     m_onlineUsers.Clear();
                     break;
                 // Active user list request
@@ -261,7 +261,7 @@ namespace Chatter
                 // Change your display name
                 case CommandList.CHANGE_NAME:
                     string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1);
-                    chatterClient.Send(m_displayName + ">/" + CommandList.NAME_CHANGED + " " + newName);
+                    chatterClient?.Send(m_displayName + ">/" + CommandList.NAME_CHANGED + " " + newName);
                     m_displayName = newName;
                     break;
                 // Change your multicast ip address
@@ -294,7 +294,7 @@ namespace Chatter
                 // Not a valid command string
                 default:
                     // Send The message
-                    chatterClient.Send(m_displayName + ">/" + message);
+                    chatterClient?.Send(m_displayName + ">/" + message);
                     break;
             }
         }
