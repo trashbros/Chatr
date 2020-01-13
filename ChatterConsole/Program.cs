@@ -22,7 +22,9 @@ namespace ChatterConsole
 {
     class Program
     {
-        static string inputMessage = string.Empty;
+        static string currentInput = string.Empty;
+        static string nextInput = string.Empty;
+
         static List<string> messageHistory = new List<string>();
         static int historyIndex = -1;
 
@@ -94,29 +96,31 @@ namespace ChatterConsole
 
         private static string ReadMessage()
         {
-            inputMessage = string.Empty;
+            currentInput = string.Empty;
             var key = Console.ReadKey(true);
             while( key.Key != ConsoleKey.Enter)
             {
-                if (key.Key == ConsoleKey.Backspace && inputMessage.Length > 0)
+                nextInput = currentInput;
+
+                if (key.Key == ConsoleKey.Backspace && currentInput.Length > 0)
                 {
-                    inputMessage = inputMessage[0..^1];
+                    nextInput = currentInput[0..^1];
                 }
                 else if (key.Key == ConsoleKey.Escape)
                 {
-                    inputMessage = "";
+                    nextInput = "";
                     historyIndex = -1;
                 }
                 else if (!char.IsControl(key.KeyChar))
                 {
-                    inputMessage += key.KeyChar;
+                    nextInput += key.KeyChar;
                 }
                 else if (key.Key == ConsoleKey.UpArrow)
                 {
                     if (messageHistory.Count > 0 && historyIndex < messageHistory.Count - 1)
                     {
                         historyIndex++;
-                        inputMessage = messageHistory[historyIndex];
+                        nextInput = messageHistory[historyIndex];
                     }
                 }
                 else if (key.Key == ConsoleKey.DownArrow)
@@ -124,7 +128,7 @@ namespace ChatterConsole
                     if (messageHistory.Count > 0 && historyIndex > 0)
                     {
                         historyIndex--;
-                        inputMessage = messageHistory[historyIndex];
+                        nextInput = messageHistory[historyIndex];
                     }
                 }
 
@@ -133,31 +137,34 @@ namespace ChatterConsole
                 key = Console.ReadKey(true);
             }
 
-            if (!string.IsNullOrEmpty(inputMessage) && !messageHistory.Contains(inputMessage))
+            if (!string.IsNullOrEmpty(currentInput) && !messageHistory.Contains(currentInput))
             {
-                messageHistory.Add(inputMessage);
+                messageHistory.Add(currentInput);
             }
             historyIndex = -1;
 
-            string message = (string) inputMessage.Clone();
-            inputMessage = string.Empty;
+            string message = (string) currentInput.Clone();
+            currentInput = string.Empty;
 
             return message;
         }
 
         private static void DisplayNewMessageAndInput(string newMessage = null)
         {
-            Console.SetCursorPosition(0, Console.CursorTop - 1 * (inputMessage.Length / Console.WindowWidth));
-            Console.Write(new string(' ', inputMessage.Length + 1));
-            Console.SetCursorPosition(0, Console.CursorTop - 1 * (inputMessage.Length / Console.WindowWidth));
+            Console.SetCursorPosition(0, Console.CursorTop - 1 * ((currentInput.Length + 1) / Console.WindowWidth));
+            Console.Write(new string(' ', currentInput.Length + 2));
+            Console.SetCursorPosition(0, Console.CursorTop - 1 * ((currentInput.Length + 1) / Console.WindowWidth)); 
+
             if (string.IsNullOrEmpty(newMessage))
             {
-                Console.Write("> " + inputMessage);
+                Console.Write("> " + nextInput);
             }
             else
             {
-                Console.Write(newMessage + "\n> " + inputMessage);
+                Console.Write(newMessage + "\n> " + nextInput);
             }
+
+            currentInput = nextInput;
         }
 
         private static void DisplayInput()
