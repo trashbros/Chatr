@@ -24,19 +24,27 @@ namespace Chatter
 {
     public class Controller
     {
+        #region Events
+        public event EventHandler<string> MessageDisplayEventHandler;
+        #endregion
+
+        #region Private Member Variables
         Client chatterClient;
 
         string m_localIP;
-
         string m_displayName;
-
         string m_multicastIP;
         int m_port;
-
         List<string> m_onlineUsers;
+        #endregion
 
-        public event EventHandler<string> MessageDisplayEventHandler;
-
+        /// <summary>
+        /// Class Initialization function. Gets log in info
+        /// </summary>
+        /// <param name="localIP"></param>
+        /// <param name="displayName"></param>
+        /// <param name="multicastIP"></param>
+        /// <param name="port"></param>
         public Controller(string localIP, string displayName, string multicastIP = "239.255.10.11", string port = "1314")
         {
             m_localIP = localIP;
@@ -50,39 +58,19 @@ namespace Chatter
             m_onlineUsers = new List<string>();
         }
 
+        #region Public Functions
+        /// <summary>
+        /// Public class for initializing the connection and beginning messaging
+        /// </summary>
         public void Init()
         {
             NewClientConnection();
         }
 
-        private void ConnectClient()
-        {
-            // Create a new Chatter client
-            chatterClient = new Client(IPAddress.Parse(m_localIP), IPAddress.Parse(m_multicastIP), m_port);
-
-            // Attach a message handler
-            chatterClient.MessageReceivedEventHandler += (sender, m) =>
-            {
-                HandleMessagingCalls(m);
-            };
-
-            // Start task to receive messages
-            _ = chatterClient.StartReceiving();
-
-            m_onlineUsers.Add(m_displayName);
-
-            System.Threading.Thread.Sleep(2000);
-
-            this.SendMessage("/" + CommandList.LOGON);
-        }
-
-        public void ShutDown()
-        {
-            this.SendMessage("/" + CommandList.QUIT);
-            chatterClient?.Dispose();
-            chatterClient = null;
-        }
-
+        /// <summary>
+        /// Class to call to send a message out. All parsing on the outgoing side goes here.
+        /// </summary>
+        /// <param name="message"></param>
         public void SendMessage(string message)
         {
             // Check to see if this is a command message
@@ -98,7 +86,48 @@ namespace Chatter
             }
         }
 
-        void HandleMessagingCalls(MessageReceivedEventArgs m)
+        /// <summary>
+        /// Command to call to shutdown the controller and internal client on program close.
+        /// </summary>
+        public void ShutDown()
+        {
+            this.SendMessage("/" + CommandList.QUIT);
+            chatterClient?.Dispose();
+            chatterClient = null;
+        }
+        #endregion
+
+        /// <summary>
+        /// Function for connecting to the actually multicast client
+        /// </summary>
+        private void ConnectClient()
+        {
+            // Create a new Chatter client
+            chatterClient = new Client(IPAddress.Parse(m_localIP), IPAddress.Parse(m_multicastIP), m_port);
+
+            // Attach a message handler
+            chatterClient.MessageReceivedEventHandler += (sender, m) =>
+            {
+                HandleMessagingCalls(m);
+            };
+
+            // Start task to receive messages
+            _ = chatterClient.StartReceiving();
+
+            // Add self as an online user
+            m_onlineUsers.Add(m_displayName);
+
+            // Wait to make sure we're actually recieving messages
+            System.Threading.Thread.Sleep(2000);
+            // Then send the log on command
+            this.SendMessage("/" + CommandList.LOGON);
+        }
+
+        /// <summary>
+        /// Our incoming message handling class the recieves messages from the multicast client
+        /// </summary>
+        /// <param name="m"></param>
+        private void HandleMessagingCalls(MessageReceivedEventArgs m)
         {
             // Parse out the sender name
             string senderName = m.Message.Split('>')[0];
@@ -107,6 +136,7 @@ namespace Chatter
             // Check to see if this is a command message
             if (text.StartsWith("/"))
             {
+                // Trim off the starting slash then try to parse the command
                 text = text.TrimStart('/');
                 HandleIncomingCommandText(text, senderName);
             }
@@ -117,6 +147,11 @@ namespace Chatter
             }
         }
 
+        /// <summary>
+        /// Parses command text of incoming messages to properly format and respond
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="senderName"></param>
         void HandleIncomingCommandText(string message, string senderName)
         {
             string command = message.Split(' ')[0];
@@ -180,7 +215,11 @@ namespace Chatter
             }
         }
 
-        void HandleOutgoingCommandText(string message)
+        /// <summary>
+        /// Parse and handle commands on the outgoing side that would react back to the user.
+        /// </summary>
+        /// <param name="message"></param>
+        private void HandleOutgoingCommandText(string message)
         {
             string command = message.Split(' ')[0];
             switch(command.ToLower())
@@ -258,6 +297,12 @@ namespace Chatter
             }
         }
 
+        /// <summary>
+        /// Message formatter to handle common formatting on messages to display to the user
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="notify"></param>
+        /// <returns></returns>
         private string FormatMessageText(string message, bool notify = false)
         {
             string formattedString = message + " \n";
@@ -273,6 +318,9 @@ namespace Chatter
             return formattedString;
         }
 
+        /// <summary>
+        /// Disconnect any existing client and connect new client
+        /// </summary>
         private void NewClientConnection()
         {
             // Check that our local IP is good
@@ -297,6 +345,11 @@ namespace Chatter
             DisplayMessage($"**************\nJoined Multicast Group:\nIP: {m_multicastIP}\nPort: {m_port.ToString()}\n**************\n");
         }
 
+        /// <summary>
+        /// Helper function to check if the IP can be parsed
+        /// </summary>
+        /// <param name="ipAdress"></param>
+        /// <returns></returns>
         private bool IsValidIP(string ipAdress)
         {
             IPAddress testAddr;
@@ -305,6 +358,13 @@ namespace Chatter
             return true;
         }
 
+
+        /// <summary>
+        /// Helper function to check if the port is a real port
+        /// </summary>
+        /// <param name="portString"></param>
+        /// <param name="portNum"></param>
+        /// <returns></returns>
         private bool IsValidPort(string portString, out int portNum)
         {
             portNum = 0;
@@ -321,6 +381,10 @@ namespace Chatter
             return true;
         }
 
+        /// <summary>
+        /// Wrapper function for invoking the message display event handler
+        /// </summary>
+        /// <param name="message"></param>
         private void DisplayMessage(string message)
         {
             MessageDisplayEventHandler?.Invoke(this, message);
