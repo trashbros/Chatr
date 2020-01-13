@@ -49,7 +49,7 @@ namespace Chatter
         public Controller(string localIP, string displayName, string multicastIP = "239.255.10.11", string port = "1314")
         {
             m_localIP = localIP;
-            m_displayName = displayName;
+            m_displayName = displayName.Replace(' ','_');
             m_multicastIP = multicastIP;
             m_port = 0;
             if(!IsValidPort(port, out m_port))
