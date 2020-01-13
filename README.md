@@ -28,10 +28,21 @@ Internal server-less client for communicating between development machines. Curr
 
     `/help` or `/h`
 
-    
+- Name Change
+
+    `/name [new name]`
+
+- Multicast IP Change
+
+    `/multicast [new ip]`
+
+- Port Change
+
+    `/port [new port]`
 
 
 ## To-Do
+- Be connected to multiple channels at once
 - Set up as background console notifications rather than full control app
 - Able to connect in and get notifications on repo pushes
 - Setup a release pipeline
