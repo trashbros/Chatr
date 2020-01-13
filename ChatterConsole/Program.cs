@@ -145,6 +145,7 @@ namespace ChatterConsole
 
             string message = (string) currentInput.Clone();
             currentInput = string.Empty;
+            nextInput = string.Empty;
 
             return message;
         }
