@@ -98,7 +98,7 @@ namespace Chatter
             }
         }
 
-        void HandleMessagingCalls(Chatter.MessageReceivedEventArgs m)
+        void HandleMessagingCalls(MessageReceivedEventArgs m)
         {
             // Parse out the sender name
             string senderName = m.Message.Split('>')[0];
@@ -113,7 +113,7 @@ namespace Chatter
             else
             {
                 // Display the message
-                DisplayMessage(FormatMessageText($"< { senderName }: { text }", (senderName != m_displayName)));
+                DisplayMessage(FormatMessageText($"{ senderName }: { text }", (senderName != m_displayName)));
             }
         }
 
@@ -129,13 +129,13 @@ namespace Chatter
                     {
                         // Display the message
                         text = text.Substring(m_displayName.Length + 1);
-                        DisplayMessage(FormatMessageText($"< [PM]{ senderName }: { text.Trim() }", true));
+                        DisplayMessage(FormatMessageText($"[PM]{ senderName }: { text.Trim() }", true));
                     }
                     else if(senderName == m_displayName)
                     {
                         string name = text.Split(' ')[0];
                         text = text.Substring(name.Length + 1);
-                        DisplayMessage(FormatMessageText($"< [PM]{ senderName } to { name }: { text.Trim() }", false));
+                        DisplayMessage(FormatMessageText($"[PM]{ senderName } to { name }: { text.Trim() }", false));
                     }
                     break;
                 // Active user return message
@@ -151,7 +151,7 @@ namespace Chatter
                     if (senderName != m_displayName)
                     {
                         m_onlineUsers.Remove(senderName);
-                        DisplayMessage(FormatMessageText($"< [{ senderName } has logged off!]"));
+                        DisplayMessage(FormatMessageText($"[{ senderName } has logged off!]"));
                     }
                     break;
                 // User logged on
@@ -159,7 +159,7 @@ namespace Chatter
                     if (senderName != m_displayName)
                     {
                         m_onlineUsers.Add(senderName);
-                        DisplayMessage(FormatMessageText($"< [{ senderName } has logged on!]"));
+                        DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"));
                         chatterClient.Send(m_displayName + ">/" + CommandList.USER_PING + " " + senderName);
                     }
                     break;
@@ -170,12 +170,12 @@ namespace Chatter
                     {
                         m_onlineUsers.Remove(senderName);
                         m_onlineUsers.Add(newName);
-                        DisplayMessage(FormatMessageText($"< [{ senderName } has changed to {newName}]"));
+                        DisplayMessage(FormatMessageText($"[{ senderName } has changed to {newName}]"));
                     }
                     break;
                 // Not a valid command, just go ahead and display it
                 default:
-                    DisplayMessage($"< { senderName }: /{ message.Trim() }");
+                    DisplayMessage(FormatMessageText($"{ senderName }: /{ message.Trim() }"));
                     break;
             }
         }
@@ -261,11 +261,14 @@ namespace Chatter
         private string FormatMessageText(string message, bool notify = false)
         {
             string formattedString = message + " \n";
+            string dateTime = DateTime.Now.ToString();
 
             if(notify)
             {
-                formattedString = "\x7" + formattedString;
+                formattedString = $"\x7" + formattedString;
             }
+
+            formattedString = $"< [{dateTime}]" + formattedString;
 
             return formattedString;
         }
