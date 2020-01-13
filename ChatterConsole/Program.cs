@@ -22,7 +22,7 @@ namespace ChatterConsole
 {
     class Program
     {
-        static string incommingMessage = string.Empty;
+        static string inputMessage = string.Empty;
         static List<string> messageHistory = new List<string>();
         static int historyIndex = -1;
 
@@ -70,10 +70,7 @@ namespace ChatterConsole
             // Attach a message display handler
             chatterClient.MessageDisplayEventHandler += (sender, m) =>
             {
-                Console.SetCursorPosition(0, Console.CursorTop);
-                Console.Write(new string(' ', Console.WindowWidth - 1));
-                Console.SetCursorPosition(0, Console.CursorTop);
-                Console.Write(m + "\n> " + incommingMessage);
+                DisplayNewMessageAndInput(m);
             };
 
             chatterClient.Init();
@@ -97,29 +94,29 @@ namespace ChatterConsole
 
         private static string ReadMessage()
         {
-            incommingMessage = string.Empty;
+            inputMessage = string.Empty;
             var key = Console.ReadKey(true);
             while( key.Key != ConsoleKey.Enter)
             {
-                if (key.Key == ConsoleKey.Backspace && incommingMessage.Length > 0)
+                if (key.Key == ConsoleKey.Backspace && inputMessage.Length > 0)
                 {
-                    incommingMessage = incommingMessage[0..^1];
+                    inputMessage = inputMessage[0..^1];
                 }
                 else if (key.Key == ConsoleKey.Escape)
                 {
-                    incommingMessage = "";
+                    inputMessage = "";
                     historyIndex = -1;
                 }
-                else if (!char.IsControl(key.KeyChar) && incommingMessage.Length < 80)
+                else if (!char.IsControl(key.KeyChar))
                 {
-                    incommingMessage += key.KeyChar;
+                    inputMessage += key.KeyChar;
                 }
                 else if (key.Key == ConsoleKey.UpArrow)
                 {
                     if (messageHistory.Count > 0 && historyIndex < messageHistory.Count - 1)
                     {
                         historyIndex++;
-                        incommingMessage = messageHistory[historyIndex];
+                        inputMessage = messageHistory[historyIndex];
                     }
                 }
                 else if (key.Key == ConsoleKey.DownArrow)
@@ -127,28 +124,45 @@ namespace ChatterConsole
                     if (messageHistory.Count > 0 && historyIndex > 0)
                     {
                         historyIndex--;
-                        incommingMessage = messageHistory[historyIndex];
+                        inputMessage = messageHistory[historyIndex];
                     }
                 }
 
-                Console.SetCursorPosition(0, Console.CursorTop);
-                Console.Write(new string(' ', Console.WindowWidth - 1));
-                Console.SetCursorPosition(0, Console.CursorTop);
-                Console.Write("> " + incommingMessage);
+                DisplayInput();
 
                 key = Console.ReadKey(true);
             }
 
-            if (!string.IsNullOrEmpty(incommingMessage) && !messageHistory.Contains(incommingMessage))
+            if (!string.IsNullOrEmpty(inputMessage) && !messageHistory.Contains(inputMessage))
             {
-                messageHistory.Add(incommingMessage);
+                messageHistory.Add(inputMessage);
             }
             historyIndex = -1;
 
-            string message = (string) incommingMessage.Clone();
-            incommingMessage = string.Empty;
+            string message = (string) inputMessage.Clone();
+            inputMessage = string.Empty;
 
             return message;
+        }
+
+        private static void DisplayNewMessageAndInput(string newMessage = null)
+        {
+            Console.SetCursorPosition(0, Console.CursorTop - 1 * (inputMessage.Length / Console.WindowWidth));
+            Console.Write(new string(' ', inputMessage.Length + 1));
+            Console.SetCursorPosition(0, Console.CursorTop - 1 * (inputMessage.Length / Console.WindowWidth));
+            if (string.IsNullOrEmpty(newMessage))
+            {
+                Console.Write("> " + inputMessage);
+            }
+            else
+            {
+                Console.Write(newMessage + "\n> " + inputMessage);
+            }
+        }
+
+        private static void DisplayInput()
+        {
+            DisplayNewMessageAndInput();
         }
 
         static bool IsQuitMessage(string message)
