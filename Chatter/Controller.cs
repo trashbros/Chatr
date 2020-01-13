@@ -246,6 +246,7 @@ namespace Chatter
                 case CommandList.QUIT_S:
                 case CommandList.QUIT:
                     chatterClient.Send(m_displayName + ">/" + CommandList.LOGOFF);
+                    m_onlineUsers.Clear();
                     break;
                 // Active user list request
                 case CommandList.USER_LIST:
@@ -278,7 +279,7 @@ namespace Chatter
                 // Change your connection port
                 case CommandList.CHANGE_PORT:
                     var portString = message.Substring(CommandList.CHANGE_PORT.Length + 1);
-                    int newPort = 0;
+                    int newPort;
                     if(!IsValidPort(portString, out newPort))
                     {
                         DisplayMessage("Invalid port number provided!");
@@ -352,8 +353,7 @@ namespace Chatter
         /// <returns></returns>
         private bool IsValidIP(string ipAdress)
         {
-            IPAddress testAddr;
-            if(!IPAddress.TryParse(ipAdress,out testAddr))
+            if (!IPAddress.TryParse(ipAdress,out _))
             { return false; }
             return true;
         }
@@ -367,7 +367,6 @@ namespace Chatter
         /// <returns></returns>
         private bool IsValidPort(string portString, out int portNum)
         {
-            portNum = 0;
             if(!Int32.TryParse(portString, out portNum))
             {
                 return false;
