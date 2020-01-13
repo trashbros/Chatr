@@ -313,7 +313,7 @@ namespace Chatter
                 formattedString = $"\x7" + formattedString;
             }
 
-            formattedString = $"< [{dateTime}]" + formattedString;
+            formattedString = $"< [{dateTime}] " + formattedString;
 
             return formattedString;
         }

@@ -145,7 +145,10 @@ namespace ChatterConsole
             }
             historyIndex = -1;
 
-            return incommingMessage;
+            string message = (string) incommingMessage.Clone();
+            incommingMessage = string.Empty;
+
+            return message;
         }
 
         static bool IsQuitMessage(string message)
