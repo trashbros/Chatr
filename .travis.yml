@@ -1,6 +1,7 @@
 language: csharp
 solution: Chatter.sln
 mono: none
-dotnet: 2.0
+dotnet: 2.0.0
+dist: xenial
 script:
   - dotnet restore
