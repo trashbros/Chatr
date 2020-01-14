@@ -13,13 +13,12 @@ namespace Chatter
         string globalDisplayName = "";
         string globalConnectionIP = "localhost";
 
-        int activeChannelIndex = 0;
+        int activeChannelIndex = -1;
 
-        public MultiChannel()
+        public MultiChannel(string filepath)
         {
             channelList = new List<Channel>();
-            // TODO: Get and read channel settings info
-            // TODO: Get and read global settings info
+            ParseSettings(filepath);
             // TODO: instantiate channels
             // TODO: Ask for channel info if no channel exists.
         }
@@ -46,7 +45,7 @@ namespace Chatter
             else
             {
                 // Send The message
-                channelList[0]?.SendMessage(message);
+                channelList[activeChannelIndex]?.SendMessage(message);
             }
         }
 
@@ -107,11 +106,41 @@ namespace Chatter
                 case CommandList.CHANNEL_INFO:
                     PrintChannelInfo(message);
                     break;
+                // Connect to a channel
+                case CommandList.CONNECT:
+                    ConnectChannels(message);
+                    break;
                 // Not a valid command string
                 default:
                     // Send The message
                     channelList[0]?.SendMessage("/" + message);
                     break;
+            }
+        }
+
+        private void ConnectChannels(string message)
+        {
+            if (message.Trim() == CommandList.CONNECT)
+            {
+                foreach (var channel in channelList)
+                {
+                    if(!channel.IsConnected)
+                    {
+                        channel.Init();
+                    }
+                }
+            }
+            else
+            {
+                var cnames = message.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 1; i < cnames.Length; i++)
+                {
+                    var chan = channelList.FindIndex(c => c.ChannelName == cnames[i]);
+                    if(!channelList[chan].IsConnected)
+                    {
+                        channelList[chan].Init();
+                    }
+                }
             }
         }
 
@@ -149,22 +178,10 @@ namespace Chatter
 
         private void AddNewChannel(ChannelSettings channelSettings, bool silent = true)
         {
-            if(string.IsNullOrWhiteSpace(channelSettings.DisplayName))
-            {
-                channelSettings.DisplayName = globalDisplayName;
-            }
-            if(string.IsNullOrWhiteSpace(channelSettings.ChannelName))
-            {
-                // TODO: Handle missing channel name... Generate name? Or abort?
-            }
-            if(string.IsNullOrWhiteSpace(channelSettings.ConnectionIP))
-            {
-                channelSettings.ConnectionIP = globalConnectionIP;
-            }
-
             // TODO: Add silent option to limit logging of channel connection stuff
-            channelList.Add(new Channel(channelSettings));
+            channelList.Add(new Channel(SetGlobals(channelSettings)));
             channelList[channelList.Count - 1].Init();
+            channelList[channelList.Count - 1].MessageDisplayEventHandler += MessageDisplayEventHandler;
         }
 
         private void DeleteChannel()
@@ -207,6 +224,113 @@ namespace Chatter
         private void DisplayMessage(string message)
         {
             MessageDisplayEventHandler?.Invoke(this, message);
+        }
+
+        private void ParseSettings(string filepath)
+        {
+            bool isglobal = true;
+            string line;
+            string channelInfo = "";
+
+            if(!System.IO.File.Exists(filepath))
+            {
+                return;
+            }
+
+            // Read the file and display it line by line.  
+            System.IO.StreamReader file =
+                new System.IO.StreamReader(filepath);
+            while ((line = file.ReadLine()) != null)
+            {
+                if (line == "[GLOBAL]")
+                {
+                    isglobal = true;
+                }
+                else if (line == "[CHANNEL]")
+                {
+                    if (!isglobal)
+                    {
+                        ChannelSettings chanSet = SetGlobals(new ChannelSettings(channelInfo));
+                        channelList.Add(new Channel(chanSet));
+                        channelList[channelList.Count - 1].MessageDisplayEventHandler += MessageDisplayEventHandler;
+                        channelInfo = "";
+                    }
+                    else
+                    {
+                        isglobal = false;
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(line) && line != "\n")
+                {
+                    var args = line.Split(new char[] { ' ', '=' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (isglobal)
+                    {
+                        switch (args[0])
+                        {
+                            case "DisplayName":
+                                globalDisplayName = args[1].Replace(' ', '_');
+                                break;
+                            case "ConnectionIP":
+                                globalConnectionIP = args[1];
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (args[0])
+                        {
+                            case "DisplayName":
+                                channelInfo += $"-dn {args[1]} ";
+                                break;
+                            case "ConnectionIP":
+                                channelInfo += $"-lip {args[1]} ";
+                                break;
+                            case "MulticastIP":
+                                channelInfo += $"-mip {args[1]} ";
+                                break;
+                            case "Port":
+                                channelInfo += $"-p {args[1]} ";
+                                break;
+                            case "Password":
+                                channelInfo += $"-pw {args[1]} ";
+                                break;
+                            case "ChannelName":
+                                channelInfo += $"-cn {args[1]} ";
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            file.Close();
+
+            if(!isglobal && !string.IsNullOrWhiteSpace(channelInfo))
+            {
+                ChannelSettings chanSet = SetGlobals(new ChannelSettings(channelInfo));
+                channelList.Add(new Channel(chanSet));
+                channelList[channelList.Count - 1].MessageDisplayEventHandler += MessageDisplayEventHandler;
+            }
+        }
+
+        private ChannelSettings SetGlobals(ChannelSettings channelSettings)
+        {
+            if (string.IsNullOrWhiteSpace(channelSettings.DisplayName))
+            {
+                channelSettings.DisplayName = globalDisplayName;
+            }
+            if (string.IsNullOrWhiteSpace(channelSettings.ChannelName))
+            {
+                // TODO: Handle missing channel name... Generate name? Or abort?
+            }
+            if (string.IsNullOrWhiteSpace(channelSettings.ConnectionIP))
+            {
+                channelSettings.ConnectionIP = globalConnectionIP;
+            }
+            return channelSettings;
         }
     }
 }

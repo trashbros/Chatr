@@ -34,40 +34,50 @@ namespace ChatterConsole
             string assVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             Console.Write($"You are running version {assVersion} of Chatter!\n");
 
-            // Get the local IP Address to use
-            string ipAddress = "";
-            if (args.Length > 0)
+            string settingsFilepath = System.IO.Path.GetFullPath("ChatrSettings");
+
+            if (args.Length > 0 && IsPathValidRootedLocal(args[0]))
             {
-                ipAddress = args[0];
-            }
-            if (string.IsNullOrEmpty(ipAddress))
-            {
-                Console.Write("Enter the local IP address to use: ");
-                ipAddress = Console.ReadLine();
-                while (string.IsNullOrEmpty(ipAddress))
-                {
-                    ipAddress = Console.ReadLine();
-                }
+                settingsFilepath = System.IO.Path.GetFullPath(args[0]);
             }
 
-            // Get the display name to use
-            string displayName = "";
-            if (args.Length > 1)
-            {
-                displayName = args[1];
-            }
-            if (string.IsNullOrEmpty(displayName))
-            {
-                Console.Write("Enter your display name: ");
-                displayName = Console.ReadLine();
-                while (string.IsNullOrEmpty(displayName))
-                {
-                    displayName = Console.ReadLine();
-                }
-            }
+
+            //// Get the local IP Address to use
+            //string ipAddress = "";
+            //if (args.Length > 0)
+            //{
+            //    ipAddress = args[0];
+            //}
+            //if (string.IsNullOrEmpty(ipAddress))
+            //{
+            //    Console.Write("Enter the local IP address to use: ");
+            //    ipAddress = Console.ReadLine();
+            //    while (string.IsNullOrEmpty(ipAddress))
+            //    {
+            //        ipAddress = Console.ReadLine();
+            //    }
+            //}
+
+            //// Get the display name to use
+            //string displayName = "";
+            //if (args.Length > 1)
+            //{
+            //    displayName = args[1];
+            //}
+            //if (string.IsNullOrEmpty(displayName))
+            //{
+            //    Console.Write("Enter your display name: ");
+            //    displayName = Console.ReadLine();
+            //    while (string.IsNullOrEmpty(displayName))
+            //    {
+            //        displayName = Console.ReadLine();
+            //    }
+            //}
 
             // Create a new Chatter client
-            var chatterClient = new Chatter.Controller(ipAddress, displayName, port: "1314");
+            //var chatterClient = new Chatter.Controller(ipAddress, displayName, port: "1314");
+
+            var chatterClient = new Chatter.MultiChannel(settingsFilepath);
 
             // Attach a message display handler
             chatterClient.MessageDisplayEventHandler += (sender, m) =>
@@ -75,7 +85,7 @@ namespace ChatterConsole
                 DisplayNewMessageAndInput(m);
             };
 
-            chatterClient.Init();
+            //chatterClient.Init();
 
             // Get messages and send them out
             Console.Write("> ");
@@ -177,6 +187,13 @@ namespace ChatterConsole
         {
             string text = message.ToLower(System.Globalization.CultureInfo.CurrentCulture).TrimStart('/');
             return (text == Chatter.CommandList.QUIT || text == Chatter.CommandList.QUIT_S);
+        }
+
+        static bool IsPathValidRootedLocal(String pathString)
+        {
+            Uri pathUri;
+            Boolean isValidUri = Uri.TryCreate(pathString, UriKind.Absolute, out pathUri);
+            return isValidUri && pathUri != null && pathUri.IsLoopback;
         }
     }
 }

@@ -23,5 +23,6 @@ namespace Chatter
         public const string ADD_CHANNEL = "add";
         public const string CHANNEL_LIST = "list";
         public const string CHANNEL_INFO = "info";
+        public const string CONNECT = "connect";
     }
 }
