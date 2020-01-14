@@ -19,5 +19,10 @@ namespace Chatter
         public const string NAME_CHANGED = "namechange";
         public const string CHANGE_MULTICAST = "multicast";
         public const string CHANGE_PORT = "port";
+        public const string CHANGE_CHANNEL = "channel";
+        public const string ADD_CHANNEL = "add";
+        public const string CHANNEL_LIST = "list";
+        public const string CHANNEL_INFO = "info";
+        public const string CONNECT = "connect";
     }
 }
