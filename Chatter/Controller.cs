@@ -104,7 +104,7 @@ namespace Chatter
         private void ConnectClient()
         {
             // Create a new Chatter client
-            chatterClient = new Client(IPAddress.Parse(m_localIP), IPAddress.Parse(m_multicastIP), m_port);
+            chatterClient = new Client(IPAddress.Parse(m_localIP), IPAddress.Parse(m_multicastIP), m_port, new Base64MessageTransform());
 
             // Attach a message handler
             chatterClient.MessageReceivedEventHandler += (sender, m) =>

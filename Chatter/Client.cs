@@ -29,6 +29,7 @@ namespace Chatter
         public IPAddress LocalIP { get; }
         public IPAddress MulticastIP { get; }
         public int Port { get; }
+        public IMessageTransform MessageTransform { get; }
         public bool ReceiveStarted
         {
             get => _receiveSocket != null;
@@ -44,11 +45,12 @@ namespace Chatter
         private bool _disposed = false;
         #endregion
 
-        public Client(IPAddress localIP, IPAddress multicastIP, int port)
+        public Client(IPAddress localIP, IPAddress multicastIP, int port, IMessageTransform messageTransform)
         {
             LocalIP = localIP;
             MulticastIP = multicastIP;
             Port = port;
+            MessageTransform = messageTransform;
         }
 
         public async Task StartReceiving()
@@ -79,7 +81,8 @@ namespace Chatter
                                 int length = _receiveSocket.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
                                 Array.Resize(ref datagram, length);
 
-                                string message = Encoding.UTF8.GetString(Convert.FromBase64String(Encoding.UTF8.GetString(datagram)));
+                                string message = MessageTransform.Decode(datagram);
+
                                 MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
                             }
                         }
@@ -117,7 +120,7 @@ namespace Chatter
             {
                 using (var udpClient = new UdpClient(new IPEndPoint(LocalIP, 0)))
                 {
-                    byte[] datagram = Encoding.UTF8.GetBytes(Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
+                    byte[] datagram = MessageTransform.Encode(message);
                     udpClient.Send(datagram, datagram.Length, new IPEndPoint(MulticastIP, Port));
                 }
             }
