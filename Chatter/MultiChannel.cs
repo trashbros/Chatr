@@ -50,7 +50,7 @@ namespace Chatter
                 }
                 else
                 {
-                    DisplayMessage("No channel selected for sending");
+                    DisplayMessage("\nNo channel selected for sending\n");
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace Chatter
                     }
                     else
                     {
-                        DisplayMessage($"No channel with name {channelname} could be found.\n");
+                        DisplayMessage($"\nNo channel with name {channelname} could be found.\n");
                     }
                     break;
                 // Add a channel
@@ -125,7 +125,7 @@ namespace Chatter
                     }
                     else
                     {
-                        DisplayMessage("No channel selected for sending");
+                        DisplayMessage("\nNo channel selected for sending\n");
                     }
                     break;
             }
@@ -194,7 +194,7 @@ namespace Chatter
             // TODO: Add silent option to limit logging of channel connection stuff
             channelList.Add(new Channel(SetGlobals(channelSettings)));
             channelList[channelList.Count - 1].Init();
-            channelList[channelList.Count - 1].MessageDisplayEventHandler += MessageDisplayEventHandler;
+            channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
         }
 
         private void DeleteChannel()
@@ -265,7 +265,7 @@ namespace Chatter
                     {
                         ChannelSettings chanSet = SetGlobals(new ChannelSettings(channelInfo));
                         channelList.Add(new Channel(chanSet));
-                        channelList[channelList.Count - 1].MessageDisplayEventHandler += MessageDisplayEventHandler;
+                        channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
                         channelInfo = "";
                     }
                     else
@@ -325,7 +325,7 @@ namespace Chatter
             {
                 ChannelSettings chanSet = SetGlobals(new ChannelSettings(channelInfo));
                 channelList.Add(new Channel(chanSet));
-                channelList[channelList.Count - 1].MessageDisplayEventHandler += MessageDisplayEventHandler;
+                channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
             }
         }
 
