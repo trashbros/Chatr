@@ -1,7 +1,7 @@
 language: csharp
 solution: Chatter.sln
 mono: none
-dotnet: 3.1.0
-dist: disco
+dotnet: 3.1.100
+dist: buster
 script:
   - dotnet restore
