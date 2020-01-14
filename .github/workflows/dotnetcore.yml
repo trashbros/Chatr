@@ -1,14 +1,13 @@
-name: .NET Core
-
-on: [push]
-
+on:
+  push:
+    tags:
+      - 'v*'
+name: Create and Upload Release
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v1
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
@@ -18,4 +17,26 @@ jobs:
       run: |
           dotnet publish ChatterConsole -r win-x64 -c Release -o ./win-x64 /p:PublishSingleFile=true
           dotnet publish ChatterConsole -r linux-x64 -c Release -o ./linux-x64 /p:PublishSingleFile=true
-          dotnet publish ChatterConsole -r osx-x64 -c Release -o ./osx-x64 /p:PublishSingleFile=true      
+          dotnet publish ChatterConsole -r osx-x64 -c Release -o ./osx-x64 /p:PublishSingleFile=true
+          zip ChatterConsole-${{ github.ref }} ./win-x64/* ./linux-x64/* ./osx-x64/* README.md
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: true
+        prerelease: true
+    - name: Upload Release
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with: 
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./ChatterConsole-${{ github.ref}}.zip
+        asset_name: ChatterConsole-${{ github.ref}}.zip
+        asset_content_type: application/zip
+       
