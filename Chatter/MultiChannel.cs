@@ -26,8 +26,7 @@ namespace Chatter
         public void ShutDown()
         {
             QuitChannels();
-            // TODO: Save channel settings
-            // 
+            CreateSettingsFile();
         }
 
         /// <summary>
@@ -45,7 +44,14 @@ namespace Chatter
             else
             {
                 // Send The message
-                channelList[activeChannelIndex]?.SendMessage(message);
+                if(activeChannelIndex > -1 && channelList[activeChannelIndex].IsConnected)
+                {
+                    channelList[activeChannelIndex]?.SendMessage(message);
+                }
+                else
+                {
+                    DisplayMessage("No channel selected for sending");
+                }
             }
         }
 
@@ -113,7 +119,14 @@ namespace Chatter
                 // Not a valid command string
                 default:
                     // Send The message
-                    channelList[0]?.SendMessage("/" + message);
+                    if (activeChannelIndex > -1 && channelList[activeChannelIndex].IsConnected)
+                    {
+                        channelList[activeChannelIndex]?.SendMessage($"/" + message);
+                    }
+                    else
+                    {
+                        DisplayMessage("No channel selected for sending");
+                    }
                     break;
             }
         }
@@ -314,6 +327,27 @@ namespace Chatter
                 channelList.Add(new Channel(chanSet));
                 channelList[channelList.Count - 1].MessageDisplayEventHandler += MessageDisplayEventHandler;
             }
+        }
+
+        private void CreateSettingsFile()
+        {
+
+            System.IO.StreamWriter file = new System.IO.StreamWriter(System.IO.Path.GetFullPath("ChatrSettings"),false);
+            file.WriteLine("[GLOBAL]");
+            file.WriteLine($"DisplayName = {globalDisplayName}");
+            file.WriteLine($"ConnectionIP = {globalConnectionIP}");
+            file.WriteLine("");
+            foreach(var channel in channelList)
+            {
+                file.WriteLine("[CHANNEL]");
+                file.WriteLine($"ChannelName = {channel.ChannelName}");
+                file.WriteLine($"DisplayName = {channel.DisplayName}");
+                file.WriteLine($"ConnectionIP = {channel.ConnectionIP}");
+                file.WriteLine($"MulticastIP = {channel.MulticastIP}");
+                file.WriteLine($"Port = {channel.Port}");
+                file.WriteLine($"Password = {channel.Password}");
+            }
+            file.Close();
         }
 
         private ChannelSettings SetGlobals(ChannelSettings channelSettings)

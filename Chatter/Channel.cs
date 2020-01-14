@@ -29,6 +29,11 @@ namespace Chatter
     {
         #region Properties
         public string ChannelName {get {return channelSettings.ChannelName;} }
+        public string DisplayName { get { return channelSettings.DisplayName; } }
+        public string ConnectionIP { get { return channelSettings.ConnectionIP; } }
+        public string MulticastIP { get { return channelSettings.MulticastIP; } }
+        public string Port { get { return channelSettings.PortString; } }
+        public string Password { get { return channelSettings.Password; } }
         public bool IsConnected { 
             get { 
                 if(chatterClient != null)
