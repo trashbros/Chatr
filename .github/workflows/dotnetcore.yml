@@ -8,10 +8,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout repository
     - uses: actions/checkout@v1
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.0.100
-    - name: Build with dotnet
-      run: dotnet build --configuration Release
+    - name: dotnet publish for Windows x64
+      run: dotnet publish ChatterConsole -r win-x64 -c Release -o ./win-x64 /p:PublishSingleFile=true
+    - name: dotnet publish for Linux x64
+      run: dotnet publish ChatterConsole -r linux-x64 -c Release -o ./linux-x64 /p:PublishSingleFile=true
+    - name: dotnet publish for macOs
+      run: dotnet publish ChatterConsole -r osx-x64 -c Release -o ./osx-x64 /p:PublishSingleFile=true      
