@@ -4,4 +4,5 @@ mono: latest
 dotnet: 3.1.100
 dist: buster
 script:
+  - msbuild Chatter.sln
   - dotnet restore
