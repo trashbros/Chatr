@@ -80,9 +80,21 @@ namespace Chatter
                                 int length = _receiveSocket.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
                                 Array.Resize(ref datagram, length);
 
-                                string message = MessageTransform.Decode(datagram);
+                                string message = null;
+                                try
+                                {
+                                    message = MessageTransform.Decode(datagram);
+                                }
+                                catch (Exception)
+                                {
+                                    // Exception trying to decode the message
+                                    // Silently ignore it
+                                }
 
-                                MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
+                                if (message != null)
+                                {
+                                    MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
+                                }
                             }
                         }
                         catch (SocketException)
@@ -115,11 +127,22 @@ namespace Chatter
 
         public void Send(string message)
         {
+            byte[] datagram;
+            try
+            {
+                datagram = MessageTransform.Encode(message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error encoding message:");
+                Console.WriteLine(e);
+                return;
+            }
+
             try
             {
                 using (var udpClient = new UdpClient(new IPEndPoint(LocalIP, 0)))
                 {
-                    byte[] datagram = MessageTransform.Encode(message);
                     udpClient.Send(datagram, datagram.Length, new IPEndPoint(MulticastIP, Port));
                 }
             }
