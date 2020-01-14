@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Globalization;
+using System.Security.Cryptography;
 
 namespace Chatter
 {
@@ -103,8 +104,10 @@ namespace Chatter
         /// </summary>
         private void ConnectClient()
         {
+            var messageTransform = new PasswordEncryptedMessageTransform($"{m_multicastIP}:{m_port}", "AES");
+
             // Create a new Chatter client
-            chatterClient = new Client(IPAddress.Parse(m_localIP), IPAddress.Parse(m_multicastIP), m_port, new Base64MessageTransform());
+            chatterClient = new Client(IPAddress.Parse(m_localIP), IPAddress.Parse(m_multicastIP), m_port, messageTransform);
 
             // Attach a message handler
             chatterClient.MessageReceivedEventHandler += (sender, m) =>
