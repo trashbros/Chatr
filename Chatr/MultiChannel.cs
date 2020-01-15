@@ -13,12 +13,15 @@ namespace Chatr
         string globalDisplayName = "user";
         string globalConnectionIP = "localhost";
 
+        string m_filepath;
+
         int activeChannelIndex = -1;
 
         public MultiChannel(string filepath)
         {
             channelList = new List<Channel>();
-            ParseSettings(filepath);
+            m_filepath = filepath;
+            ParseSettings(m_filepath);
             // TODO: instantiate channels
             // TODO: Ask for channel info if no channel exists.
         }
@@ -352,7 +355,7 @@ namespace Chatr
         private void CreateSettingsFile()
         {
 
-            System.IO.StreamWriter file = new System.IO.StreamWriter(System.IO.Path.GetFullPath("ChatrSettings"),false);
+            System.IO.StreamWriter file = new System.IO.StreamWriter(m_filepath, false);
             file.WriteLine("[GLOBAL]");
             file.WriteLine($"DisplayName = {globalDisplayName}");
             file.WriteLine($"ConnectionIP = {globalConnectionIP}");
@@ -365,7 +368,8 @@ namespace Chatr
                 file.WriteLine($"ConnectionIP = {channel.ConnectionIP}");
                 file.WriteLine($"MulticastIP = {channel.MulticastIP}");
                 file.WriteLine($"Port = {channel.Port}");
-                file.WriteLine($"Password = {channel.Password}\n");
+                file.WriteLine($"Password = {channel.Password}");
+                file.WriteLine("");
             }
             file.Close();
         }

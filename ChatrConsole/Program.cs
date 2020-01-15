@@ -125,7 +125,7 @@ namespace ChatrConsole
         static string GetSettingsPath(string settingsPath)
         {
             // Default path in case supplied path is invalid
-            string path = System.IO.Path.GetFullPath("ChatrSettings");
+            string path = System.IO.Path.GetFullPath(".chatrconfig");
 
             // Check to see if the path is valid
             if (IsPathValidRootedLocal(settingsPath))
