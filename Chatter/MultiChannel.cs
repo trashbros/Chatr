@@ -44,14 +44,7 @@ namespace Chatter
             else
             {
                 // Send The message
-                if(activeChannelIndex > -1 && channelList[activeChannelIndex].IsConnected)
-                {
-                    channelList[activeChannelIndex]?.SendMessage(message);
-                }
-                else
-                {
-                    DisplayMessage("\nNo channel selected for sending\n");
-                }
+                PassMessage(message);
             }
         }
 
@@ -104,10 +97,23 @@ namespace Chatter
                     if (newchan > -1)
                     {
                         activeChannelIndex = newchan;
+                        DisplayMessage($"\nConnected to channel {channelname} for chatting.\n");
                     }
                     else
                     {
                         DisplayMessage($"\nNo channel with name {channelname} could be found.\n");
+                    }
+                    break;
+                // Change global username
+                case CommandList.CHANGE_NAME:
+                    var text = message.Substring(CommandList.CHANGE_NAME.Length + 1);
+                    if(text.Contains(" -g "))
+                    {
+                        // TODO: Add global username change in here
+                    }
+                    else
+                    {
+                        PassMessage($"/" + message);
                     }
                     break;
                 // Add a channel
@@ -129,14 +135,7 @@ namespace Chatter
                 // Not a valid command string
                 default:
                     // Send The message
-                    if (activeChannelIndex > -1 && channelList[activeChannelIndex].IsConnected)
-                    {
-                        channelList[activeChannelIndex]?.SendMessage($"/" + message);
-                    }
-                    else
-                    {
-                        DisplayMessage("\nNo channel selected for sending\n");
-                    }
+                    PassMessage($"/" + message);
                     break;
             }
         }
@@ -203,8 +202,9 @@ namespace Chatter
         {
             // TODO: Add silent option to limit logging of channel connection stuff
             channelList.Add(new Channel(SetGlobals(channelSettings)));
-            channelList[channelList.Count - 1].Init();
             channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
+            channelList[channelList.Count - 1].Init();
+            
         }
 
         private void DeleteChannel()
@@ -355,7 +355,7 @@ namespace Chatter
                 file.WriteLine($"ConnectionIP = {channel.ConnectionIP}");
                 file.WriteLine($"MulticastIP = {channel.MulticastIP}");
                 file.WriteLine($"Port = {channel.Port}");
-                file.WriteLine($"Password = {channel.Password}");
+                file.WriteLine($"Password = {channel.Password}\n");
             }
             file.Close();
         }
@@ -375,6 +375,19 @@ namespace Chatter
                 channelSettings.ConnectionIP = globalConnectionIP;
             }
             return channelSettings;
+        }
+
+        private void PassMessage(string message)
+        {
+            // Send The message
+            if (activeChannelIndex > -1 && channelList[activeChannelIndex].IsConnected)
+            {
+                channelList[activeChannelIndex]?.SendMessage(message);
+            }
+            else
+            {
+                DisplayMessage("\nNo channel selected for sending\n");
+            }
         }
     }
 }
