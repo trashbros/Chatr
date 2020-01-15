@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 
-namespace ChatterConsole
+namespace ChatrConsole
 {
     class Program
     {
@@ -28,7 +28,7 @@ namespace ChatterConsole
         static string s_nextInput = string.Empty;
         static readonly List<string> s_messageHistory = new List<string>();
         static int s_historyIndex = -1;
-        static Chatter.MultiChannel s_chatterClient;
+        static Chatr.MultiChannel s_chatrClient;
         #endregion Fields
 
         /// <summary>
@@ -43,14 +43,14 @@ namespace ChatterConsole
             // Try and read the settings path from the command line arguments
             string settingsPath = (args == null || args.Length == 0) ? null : args[0];
 
-            // Startup the Chatter client
-            StartupChatter(GetSettingsPath(settingsPath));
+            // Startup the Chatr client
+            StartupChatr(GetSettingsPath(settingsPath));
 
             // Read and process commands entered by the user until the quit message is entered
             ReadAndProcessMessagesUntilQuit();
 
-            // Shutdown the Chatter client
-            ShutdownChatter();
+            // Shutdown the Chatr client
+            ShutdownChatr();
         }
 
         /// <summary>
@@ -62,20 +62,20 @@ namespace ChatterConsole
             string assVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             // Display the version to the console
-            Console.WriteLine($"You are running version {assVersion} of Chatter!");
+            Console.WriteLine($"You are running version {assVersion} of Chatr!");
         }
 
         /// <summary>
-        ///  Start a new Chatter client using the settings from <paramref name="settingsPath"/>
+        ///  Start a new Chatr client using the settings from <paramref name="settingsPath"/>
         /// </summary>
-        /// <param name="settingsPath">File path to chatter settings file</param>
-        static void StartupChatter(string settingsPath)
+        /// <param name="settingsPath">File path to chatr settings file</param>
+        static void StartupChatr(string settingsPath)
         {
-            // Create a new Chatter client
-            s_chatterClient = new Chatter.MultiChannel(settingsPath);
+            // Create a new Chatr client
+            s_chatrClient = new Chatr.MultiChannel(settingsPath);
 
             // Attach a message display handler
-            s_chatterClient.MessageDisplayEventHandler += (sender, m) =>
+            s_chatrClient.MessageDisplayEventHandler += (sender, m) =>
             {
                 DisplayMessage(m);
             };
@@ -99,7 +99,7 @@ namespace ChatterConsole
                 if (!string.IsNullOrEmpty(message))
                 {
                     // Send the message to the client
-                    s_chatterClient.SendMessage(message);
+                    s_chatrClient.SendMessage(message);
                 }
 
                 // Read the next message
@@ -108,12 +108,12 @@ namespace ChatterConsole
         }
 
         /// <summary>
-        /// Shutdown the Chatter client
+        /// Shutdown the Chatr client
         /// </summary>
-        static void ShutdownChatter()
+        static void ShutdownChatr()
         {
-            s_chatterClient?.ShutDown();
-            s_chatterClient = null;
+            s_chatrClient?.ShutDown();
+            s_chatrClient = null;
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace ChatterConsole
         static bool IsQuitMessage(string message)
         {
             string text = message.ToLower(System.Globalization.CultureInfo.CurrentCulture).TrimStart('/');
-            return (text == Chatter.CommandList.QUIT || text == Chatter.CommandList.QUIT_S);
+            return (text == Chatr.CommandList.QUIT || text == Chatr.CommandList.QUIT_S);
         }
 
         /// <summary>

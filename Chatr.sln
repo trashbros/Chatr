@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chatter", "Chatter\Chatter.csproj", "{77E20C40-965F-47E4-8B97-B34DC49FCA29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chatr", "Chatr\Chatr.csproj", "{77E20C40-965F-47E4-8B97-B34DC49FCA29}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatterConsole", "ChatterConsole\ChatterConsole.csproj", "{19AA6566-02D8-47CF-B4B7-598EDA9B93E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatrConsole", "ChatrConsole\ChatrConsole.csproj", "{19AA6566-02D8-47CF-B4B7-598EDA9B93E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,14 +1,14 @@
-# Chatter
+# Chatr
 Internal server-less chat client for communicating between development machines.
 Currently, only runs in a console and only provides conversation between all running clients indiscriminantly.
 
 ## Build Instructions
 - Requires .NET Core 3.0 SDK
 - Visual Studio 2019
-- Startup project is ChatterConsole
+- Startup project is ChatrConsole
 
 ## Usage Instructions
-- Run the ChatterConsole executable
+- Run the ChatrConsole executable
 - Start chatting in the console window
 
 ## Commands

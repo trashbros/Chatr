@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Chatter
+namespace Chatr
 {
     public class CommandList
     {

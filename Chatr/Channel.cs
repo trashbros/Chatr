@@ -23,7 +23,7 @@ using System.Text;
 using System.Globalization;
 using System.Security.Cryptography;
 
-namespace Chatter
+namespace Chatr
 {
     public class Channel
     {
@@ -36,9 +36,9 @@ namespace Chatter
         public string Password { get { return channelSettings.Password; } }
         public bool IsConnected { 
             get { 
-                if(chatterClient != null)
+                if(chatrClient != null)
                 {
-                    return chatterClient.ReceiveStarted;
+                    return chatrClient.ReceiveStarted;
                 }
                 return false; 
             } 
@@ -50,7 +50,7 @@ namespace Chatter
         #endregion
 
         #region Private Member Variables
-        Client chatterClient;
+        Client chatrClient;
 
         ChannelSettings channelSettings;
 
@@ -100,7 +100,7 @@ namespace Chatter
             else
             {
                 // Send The message
-                chatterClient?.Send(channelSettings.DisplayName + ">" + message);
+                chatrClient?.Send(channelSettings.DisplayName + ">" + message);
             }
         }
 
@@ -110,8 +110,8 @@ namespace Chatter
         public void ShutDown()
         {
             this.SendMessage("/" + CommandList.QUIT);
-            chatterClient?.Dispose();
-            chatterClient = null;
+            chatrClient?.Dispose();
+            chatrClient = null;
         }
         #endregion
 
@@ -122,17 +122,17 @@ namespace Chatter
         {
             var messageTransform = new PasswordEncryptedMessageTransform(channelSettings.Password, "AES");
 
-            // Create a new Chatter client
-            chatterClient = new Client(IPAddress.Parse(channelSettings.ConnectionIP), IPAddress.Parse(channelSettings.MulticastIP), channelSettings.Port, messageTransform);
+            // Create a new Chatr client
+            chatrClient = new Client(IPAddress.Parse(channelSettings.ConnectionIP), IPAddress.Parse(channelSettings.MulticastIP), channelSettings.Port, messageTransform);
 
             // Attach a message handler
-            chatterClient.MessageReceivedEventHandler += (sender, m) =>
+            chatrClient.MessageReceivedEventHandler += (sender, m) =>
             {
                 HandleMessagingCalls(m);
             };
 
             // Start task to receive messages
-            _ = chatterClient.StartReceiving();
+            _ = chatrClient.StartReceiving();
 
             // Add self as an online user
             m_onlineUsers.Add(channelSettings.DisplayName);
@@ -215,7 +215,7 @@ namespace Chatter
                     {
                         m_onlineUsers.Add(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"));
-                        chatterClient?.Send(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName);
+                        chatrClient?.Send(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName);
                     }
                     break;
                 // Notified a user changed their display name
@@ -247,7 +247,7 @@ namespace Chatter
                 // Quit command
                 case CommandList.QUIT_S:
                 case CommandList.QUIT:
-                    chatterClient?.Send(channelSettings.DisplayName + ">/" + CommandList.LOGOFF);
+                    chatrClient?.Send(channelSettings.DisplayName + ">/" + CommandList.LOGOFF);
                     m_onlineUsers.Clear();
                     break;
                 // Active user list request
@@ -262,7 +262,7 @@ namespace Chatter
                 // Change your display name
                 case CommandList.CHANGE_NAME:
                     string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1);
-                    chatterClient?.Send(channelSettings.DisplayName + ">/" + CommandList.NAME_CHANGED + " " + newName);
+                    chatrClient?.Send(channelSettings.DisplayName + ">/" + CommandList.NAME_CHANGED + " " + newName);
                     channelSettings.DisplayName = newName;
                     break;
                 // Change your multicast ip address
@@ -294,7 +294,7 @@ namespace Chatter
                 // Not a valid command string
                 default:
                     // Send The message
-                    chatterClient?.Send(channelSettings.DisplayName + ">/" + message);
+                    chatrClient?.Send(channelSettings.DisplayName + ">/" + message);
                     break;
             }
         }
@@ -338,7 +338,7 @@ namespace Chatter
                 return;
             }
 
-            if (chatterClient != null)
+            if (chatrClient != null)
             {
                 ShutDown();
 

@@ -1,4 +1,5 @@
 ﻿/*
+Event data associated with received messages
 Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
 
 This program is free software: you can redistribute it and/or modify
@@ -15,23 +16,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
+using System.Net;
 
-namespace Chatter
+namespace Chatr
 {
-    public class ClientAlreadyReceivingException : Exception
+    public class MessageReceivedEventArgs : EventArgs
     {
-        public ClientAlreadyReceivingException()
+        public string Message { get; set; }
+        public IPAddress SenderIP { get; set; }
+        public MessageReceivedEventArgs(string message, IPAddress senderIP)
         {
-        }
-
-        public ClientAlreadyReceivingException(string message)
-            : base(message)
-        {
-        }
-
-        public ClientAlreadyReceivingException(string message, Exception inner)
-            : base(message, inner)
-        {
+            Message = message;
+            SenderIP = senderIP;
         }
     }
 }

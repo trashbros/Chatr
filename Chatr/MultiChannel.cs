@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Chatter
+namespace Chatr
 {
     public class MultiChannel
     {
@@ -81,7 +81,7 @@ namespace Chatter
                     helptext += $"/{CommandList.CHANGE_MULTICAST} [IP address]\n               Changes to a different multicast group.\n";
                     helptext += $"/{CommandList.CHANGE_PORT} [Port number]\n               Changes to a different port on the current multicast IP address\n";
                     helptext += "\nThis software is provided under the GNU AGPL3.0 license.\n";
-                    helptext += @"The source code can be found at https://github.com/trashbros/Chatter/";
+                    helptext += @"The source code can be found at https://github.com/trashbros/Chatr/";
                     helptext += "\n";
                     DisplayMessage(helptext);
                     break;
