@@ -1,5 +1,6 @@
 ﻿/*
-Startup console application. Handle format and console read/write
+Startup console application. Handle format and console read/write.
+
 Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
 
 This program is free software: you can redistribute it and/or modify
@@ -22,178 +23,267 @@ namespace ChatterConsole
 {
     class Program
     {
-        static string currentInput = string.Empty;
-        static string nextInput = string.Empty;
+        #region Fields
+        static string s_currentInput = string.Empty;
+        static string s_nextInput = string.Empty;
+        static readonly List<string> s_messageHistory = new List<string>();
+        static int s_historyIndex = -1;
+        static Chatter.MultiChannel s_chatterClient;
+        #endregion Fields
 
-        static List<string> messageHistory = new List<string>();
-        static int historyIndex = -1;
-
+        /// <summary>
+        /// Entry point of the program.
+        /// </summary>
+        /// <param name="args">Command line arguments</param>
         static void Main(string[] args)
         {
-            // Print the version number on startup
-            string assVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            Console.Write($"You are running version {assVersion} of Chatter!\n");
+            // Display the assembly version information
+            DisplayVersion();
 
-            string settingsFilepath = System.IO.Path.GetFullPath("ChatrSettings");
+            // Try and read the settings path from the command line arguments
+            string settingsPath = (args == null || args.Length == 0) ? null : args[0];
 
-            if (args.Length > 0 && IsPathValidRootedLocal(args[0]))
-            {
-                settingsFilepath = System.IO.Path.GetFullPath(args[0]);
-            }
+            // Startup the Chatter client
+            StartupChatter(GetSettingsPath(settingsPath));
 
+            // Read and process commands entered by the user until the quit message is entered
+            ReadAndProcessMessagesUntilQuit();
 
-            //// Get the local IP Address to use
-            //string ipAddress = "";
-            //if (args.Length > 0)
-            //{
-            //    ipAddress = args[0];
-            //}
-            //if (string.IsNullOrEmpty(ipAddress))
-            //{
-            //    Console.Write("Enter the local IP address to use: ");
-            //    ipAddress = Console.ReadLine();
-            //    while (string.IsNullOrEmpty(ipAddress))
-            //    {
-            //        ipAddress = Console.ReadLine();
-            //    }
-            //}
-
-            //// Get the display name to use
-            //string displayName = "";
-            //if (args.Length > 1)
-            //{
-            //    displayName = args[1];
-            //}
-            //if (string.IsNullOrEmpty(displayName))
-            //{
-            //    Console.Write("Enter your display name: ");
-            //    displayName = Console.ReadLine();
-            //    while (string.IsNullOrEmpty(displayName))
-            //    {
-            //        displayName = Console.ReadLine();
-            //    }
-            //}
-
-            // Create a new Chatter client
-            //var chatterClient = new Chatter.Controller(ipAddress, displayName, port: "1314");
-
-            var chatterClient = new Chatter.MultiChannel(settingsFilepath);
-
-            // Attach a message display handler
-            chatterClient.MessageDisplayEventHandler += (sender, m) =>
-            {
-                DisplayNewMessageAndInput(m);
-            };
-
-            //chatterClient.Init();
-
-            // Get messages and send them out
-            Console.Write("> ");
-            string message = ReadMessage();
-
-            while (!IsQuitMessage(message))
-            {
-                if (!string.IsNullOrEmpty(message))
-                {
-                    chatterClient.SendMessage(message);
-                }
-
-                message = ReadMessage();
-            };
-
-            chatterClient.ShutDown();
+            // Shutdown the Chatter client
+            ShutdownChatter();
         }
 
-        private static string ReadMessage()
+        /// <summary>
+        /// Display the assembly version information
+        /// </summary>
+        static void DisplayVersion()
         {
-            currentInput = string.Empty;
+            // Get the version from currently executing assembly
+            string assVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+            // Display the version to the console
+            Console.WriteLine($"You are running version {assVersion} of Chatter!");
+        }
+
+        /// <summary>
+        ///  Start a new Chatter client using the settings from <paramref name="settingsPath"/>
+        /// </summary>
+        /// <param name="settingsPath">File path to chatter settings file</param>
+        static void StartupChatter(string settingsPath)
+        {
+            // Create a new Chatter client
+            s_chatterClient = new Chatter.MultiChannel(settingsPath);
+
+            // Attach a message display handler
+            s_chatterClient.MessageDisplayEventHandler += (sender, m) =>
+            {
+                DisplayMessage(m);
+            };
+        }
+
+        /// <summary>
+        /// Read messages entered by the user and send them to the client util the user enters the quit message
+        /// </summary>
+        static void ReadAndProcessMessagesUntilQuit()
+        {
+            // Display intial prompt
+            Console.Write("\n> ");
+
+            // Read the first message
+            string message = ReadMessage();
+
+            // Loop while it isn't the quit message
+            while (!IsQuitMessage(message))
+            {
+                // Check to see if user actually entered something
+                if (!string.IsNullOrEmpty(message))
+                {
+                    // Send the message to the client
+                    s_chatterClient.SendMessage(message);
+                }
+
+                // Read the next message
+                message = ReadMessage();
+            };
+        }
+
+        /// <summary>
+        /// Shutdown the Chatter client
+        /// </summary>
+        static void ShutdownChatter()
+        {
+            s_chatterClient?.ShutDown();
+            s_chatterClient = null;
+        }
+
+        /// <summary>
+        /// Get the settings path based on a suggested settings path
+        /// Use the default path if invalid
+        /// </summary>
+        /// <param name="settingsPath">Settings path to use</param>
+        /// <returns></returns>
+        static string GetSettingsPath(string settingsPath)
+        {
+            // Default path in case supplied path is invalid
+            string path = System.IO.Path.GetFullPath("ChatrSettings");
+
+            // Check to see if the path is valid
+            if (IsPathValidRootedLocal(settingsPath))
+            {
+                // Use the supplied settings path
+                path = System.IO.Path.GetFullPath(settingsPath);
+            }
+
+            return path;
+        }
+
+        /// <summary>
+        /// Validate that path is a rooted, local path
+        /// </summary>
+        /// <param name="pathString">Path to validate</param>
+        /// <returns>true if path is rooted, local path, false otherwise</returns>
+        static bool IsPathValidRootedLocal(String pathString)
+        {
+            bool isValidUri = Uri.TryCreate(pathString, UriKind.Absolute, out Uri pathUri);
+            return isValidUri && pathUri != null && pathUri.IsLoopback;
+        }
+
+        /// <summary>
+        /// Read a message from the console
+        /// </summary>
+        /// <returns>Message that was read</returns>
+        static string ReadMessage()
+        {
+            // Clear input strings
+            s_currentInput = string.Empty;
+            s_nextInput = string.Empty;
+
+            // Read the first key from the console
             var key = Console.ReadKey(true);
+
+            // Loop until the ENTER key is pressed
             while( key.Key != ConsoleKey.Enter)
             {
-                nextInput = currentInput;
+                // Intialize the next input to the current input
+                s_nextInput = s_currentInput;
 
-                if (key.Key == ConsoleKey.Backspace && currentInput.Length > 0)
+                // Reset the history index
+                s_historyIndex = -1;
+
+                // Check for a backspace
+                if (key.Key == ConsoleKey.Backspace && s_currentInput.Length > 0)
                 {
-                    nextInput = currentInput[0..^1];
+                    // Remote the last character from the input
+                    s_nextInput = s_currentInput[0..^1];
                 }
+                // Check for the ESC key
                 else if (key.Key == ConsoleKey.Escape)
                 {
-                    nextInput = "";
-                    historyIndex = -1;
+                    // Clear the input
+                    s_nextInput = string.Empty;
+
+                    // Reset the history index
+                    s_historyIndex = -1;
                 }
-                else if (!char.IsControl(key.KeyChar))
-                {
-                    nextInput += key.KeyChar;
-                }
+                // Check for UP arrow key
                 else if (key.Key == ConsoleKey.UpArrow)
                 {
-                    if (messageHistory.Count > 0 && historyIndex < messageHistory.Count - 1)
+                    // If we can go forward in history
+                    if (s_messageHistory.Count > 0 && s_historyIndex < s_messageHistory.Count - 1)
                     {
-                        historyIndex++;
-                        nextInput = messageHistory[historyIndex];
+                        // Move forward in the history
+                        s_historyIndex++;
+                        s_nextInput = s_messageHistory[s_historyIndex];
                     }
                 }
+                // Check for DOWN arrow key
                 else if (key.Key == ConsoleKey.DownArrow)
                 {
-                    if (messageHistory.Count > 0 && historyIndex > 0)
+                    // If we can go back in history
+                    if (s_messageHistory.Count > 0 && s_historyIndex > 0)
                     {
-                        historyIndex--;
-                        nextInput = messageHistory[historyIndex];
+                        // Move back in history
+                        s_historyIndex--;
+                        s_nextInput = s_messageHistory[s_historyIndex];
                     }
                 }
+                // Check to see if this is not a control key
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    // Add the key character to the input
+                    s_nextInput = s_currentInput + key.KeyChar;
+                }
 
+                // Display the input
                 DisplayInput();
 
+                // Current input now becomes the next input value
+                s_currentInput = s_nextInput;
+
+                // Read the next key
                 key = Console.ReadKey(true);
             }
 
-            if (!string.IsNullOrEmpty(currentInput) && !messageHistory.Contains(currentInput))
+            // Check to see if we should add this input to the history
+            if (!string.IsNullOrEmpty(s_currentInput) && !s_messageHistory.Contains(s_currentInput))
             {
-                messageHistory.Add(currentInput);
+                // Insert this input to the top of the history
+                s_messageHistory.Insert(0, s_currentInput);
             }
-            historyIndex = -1;
 
-            string message = (string) currentInput.Clone();
-            currentInput = string.Empty;
-            nextInput = string.Empty;
+            // Get the message to return
+            string message = s_currentInput;
 
+            // Clear the input strings
+            s_currentInput = string.Empty;
+            s_nextInput = string.Empty;
+
+            // Return the message entered in the console
             return message;
         }
 
-        private static void DisplayNewMessageAndInput(string newMessage = null)
-        {
-            Console.SetCursorPosition(0, Console.CursorTop - 1 * ((currentInput.Length + 1) / Console.WindowWidth));
-            Console.Write(new string(' ', currentInput.Length + 2));
-            Console.SetCursorPosition(0, Console.CursorTop - 1 * ((currentInput.Length + 1) / Console.WindowWidth)); 
-
-            if (string.IsNullOrEmpty(newMessage))
-            {
-                Console.Write("> " + nextInput);
-            }
-            else
-            {
-                Console.Write(newMessage + "\n> " + nextInput);
-            }
-
-            currentInput = nextInput;
-        }
-
-        private static void DisplayInput()
-        {
-            DisplayNewMessageAndInput();
-        }
-
+        /// <summary>
+        /// Check to see if a message is the quit message
+        /// </summary>
+        /// <param name="message">Message to check</param>
+        /// <returns></returns>
         static bool IsQuitMessage(string message)
         {
             string text = message.ToLower(System.Globalization.CultureInfo.CurrentCulture).TrimStart('/');
             return (text == Chatter.CommandList.QUIT || text == Chatter.CommandList.QUIT_S);
         }
 
-        static bool IsPathValidRootedLocal(String pathString)
+        /// <summary>
+        /// Display a recevied message
+        /// </summary>
+        /// <param name="message">Message to display</param>
+        static void DisplayMessage(string message)
         {
-            Uri pathUri;
-            Boolean isValidUri = Uri.TryCreate(pathString, UriKind.Absolute, out pathUri);
-            return isValidUri && pathUri != null && pathUri.IsLoopback;
+            ClearInputLines();
+
+            Console.Write(message + "\n> " + s_nextInput);
+        }
+
+        /// <summary>
+        /// Display the message input from the user
+        /// </summary>
+        static void DisplayInput()
+        {
+            // Clear the previous message input
+            ClearInputLines();
+
+            // Display the new message input
+            Console.Write("> " + s_nextInput);
+        }
+
+        /// <summary>
+        /// Clear any user message input from the display
+        /// </summary>
+        static void ClearInputLines()
+        {
+            Console.SetCursorPosition(0, Console.CursorTop - 1 * ((s_currentInput.Length + 1) / Console.WindowWidth));
+            Console.Write(new string(' ', s_currentInput.Length + 2));
+            Console.SetCursorPosition(0, Console.CursorTop - 1 * ((s_currentInput.Length + 1) / Console.WindowWidth));
         }
     }
 }
