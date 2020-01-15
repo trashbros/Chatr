@@ -34,6 +34,9 @@ namespace Chatr
         public string MulticastIP { get { return channelSettings.MulticastIP; } }
         public string Port { get { return channelSettings.PortString; } }
         public string Password { get { return channelSettings.Password; } }
+        public string BaseColor { get { return channelSettings.BaseColor; } }
+        public string PMColor { get { return channelSettings.PMColor; } }
+        public string SystemMessageColor { get { return channelSettings.SystemMessageColor; } }
         public bool IsConnected { 
             get { 
                 if(chatrClient != null)
@@ -46,7 +49,7 @@ namespace Chatr
         #endregion
 
         #region Events
-        public event EventHandler<string> MessageDisplayEventHandler;
+        public event EventHandler<string[]> MessageDisplayEventHandler;
         #endregion
 
         #region Private Member Variables
@@ -63,15 +66,7 @@ namespace Chatr
         /// <param name="channelSettings"></param>
         public Channel(ChannelSettings channelSettings)
         {
-            this.channelSettings = new ChannelSettings()
-            {
-                ChannelName = channelSettings.ChannelName,
-                DisplayName = channelSettings.DisplayName,
-                ConnectionIP = channelSettings.ConnectionIP,
-                MulticastIP = channelSettings.MulticastIP,
-                PortString = channelSettings.PortString,
-                Password = channelSettings.Password
-            };
+            this.channelSettings = channelSettings;
 
             m_onlineUsers = new List<string>();
         }
@@ -163,7 +158,7 @@ namespace Chatr
             else
             {
                 // Display the message
-                DisplayMessage(FormatMessageText($"{ senderName }: { text }", (senderName != channelSettings.DisplayName)));
+                DisplayMessage(FormatMessageText($"{ senderName }: { text }", (senderName != channelSettings.DisplayName)),BaseColor);
             }
         }
 
@@ -184,13 +179,13 @@ namespace Chatr
                     {
                         // Display the message
                         text = text.Substring(channelSettings.DisplayName.Length + 1);
-                        DisplayMessage(FormatMessageText($"[PM]{ senderName }: { text.Trim() }", true));
+                        DisplayMessage(FormatMessageText($"[PM]{ senderName }: { text.Trim() }", true),PMColor);
                     }
                     else if (string.Compare(senderName, channelSettings.DisplayName, StringComparison.Ordinal) == 0)
                     {
                         string name = text.Split(' ')[0];
                         text = text.Substring(name.Length + 1);
-                        DisplayMessage(FormatMessageText($"[PM]{ senderName } to { name }: { text.Trim() }", false));
+                        DisplayMessage(FormatMessageText($"[PM]{ senderName } to { name }: { text.Trim() }", false),PMColor);
                     }
                     break;
                 // Active user return message
@@ -206,7 +201,7 @@ namespace Chatr
                     if (string.Compare(senderName, channelSettings.DisplayName, StringComparison.Ordinal) != 0)
                     {
                         m_onlineUsers.Remove(senderName);
-                        DisplayMessage(FormatMessageText($"[{ senderName } has logged off!]"));
+                        DisplayMessage(FormatMessageText($"[{ senderName } has logged off!]"), SystemMessageColor);
                     }
                     break;
                 // User logged on
@@ -214,7 +209,7 @@ namespace Chatr
                     if (string.Compare(senderName, channelSettings.DisplayName, StringComparison.Ordinal) != 0)
                     {
                         m_onlineUsers.Add(senderName);
-                        DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"));
+                        DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"), SystemMessageColor);
                         chatrClient?.Send(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName);
                     }
                     break;
@@ -225,12 +220,12 @@ namespace Chatr
                     {
                         m_onlineUsers.Remove(senderName);
                         m_onlineUsers.Add(newName);
-                        DisplayMessage(FormatMessageText($"[{ senderName } has changed to {newName}]"));
+                        DisplayMessage(FormatMessageText($"[{ senderName } has changed to {newName}]"),SystemMessageColor);
                     }
                     break;
                 // Not a valid command, just go ahead and display it
                 default:
-                    DisplayMessage(FormatMessageText($"{ senderName }: /{ message.Trim() }"));
+                    DisplayMessage(FormatMessageText($"{ senderName }: /{ message.Trim() }"), BaseColor);
                     break;
             }
         }
@@ -257,7 +252,7 @@ namespace Chatr
                     {
                         userText += user + "\n";
                     }
-                    DisplayMessage(userText);
+                    DisplayMessage(userText, SystemMessageColor);
                     break;
                 // Change your display name
                 case CommandList.CHANGE_NAME:
@@ -270,7 +265,7 @@ namespace Chatr
                     var newIP = message.Substring(CommandList.CHANGE_MULTICAST.Length + 1);
                     if (!Helpers.IsValidIP(newIP))
                     {
-                        DisplayMessage("Multicast IP is not valid\n");
+                        DisplayMessage("Multicast IP is not valid\n", SystemMessageColor);
                     }
                     else
                     {
@@ -284,7 +279,7 @@ namespace Chatr
                     channelSettings.PortString = portString;
                     if(channelSettings.PortString != portString)
                     {
-                        DisplayMessage("Invalid port number provided!");
+                        DisplayMessage("Invalid port number provided!\n", SystemMessageColor);
                     }
                     else
                     {
@@ -328,13 +323,13 @@ namespace Chatr
             // Check that our local IP is good
             if (!Helpers.IsValidIP(channelSettings.ConnectionIP))
             {
-                DisplayMessage("Invalid client IP provided!\n");
+                DisplayMessage("Invalid client IP provided!\n", SystemMessageColor);
                 return;
             }
             // Check that our multicast IP is good
             if (!Helpers.IsValidIP(channelSettings.MulticastIP))
             {
-                DisplayMessage("Invalid multicast IP provided!\n");
+                DisplayMessage("Invalid multicast IP provided!\n",SystemMessageColor);
                 return;
             }
 
@@ -344,16 +339,16 @@ namespace Chatr
 
             }
             ConnectClient();
-            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelSettings.MulticastIP}\nPort: {channelSettings.Port.ToString()}\n**************\n");
+            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelSettings.MulticastIP}\nPort: {channelSettings.Port.ToString()}\n**************\n",SystemMessageColor);
         }
 
         /// <summary>
         /// Wrapper function for invoking the message display event handler
         /// </summary>
         /// <param name="message"></param>
-        private void DisplayMessage(string message)
+        private void DisplayMessage(string message,string textColor)
         {
-            MessageDisplayEventHandler?.Invoke(this, message);
+            MessageDisplayEventHandler?.Invoke(this, new string[]{ message,textColor});
         }
 
         public override string ToString()

@@ -1,30 +1,11 @@
-﻿/*
-Storage class for channel setting information
-Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Chatr
 {
-    public class ChannelSettings
+    public class GlobalSettings
     {
-        public string ChannelName { get { return m_channelName; } set { m_channelName = value.Replace(' ', '_'); } }
-        private string m_channelName;
         public string DisplayName { get { return m_displayName; } set { m_displayName = value.Replace(' ', '_'); } }
         private string m_displayName;
         public string ConnectionIP { get; set; }
@@ -63,45 +44,35 @@ namespace Chatr
         public string PMColor { get; set; }
         public string SystemMessageColor { get; set; }
 
-        public ChannelSettings(GlobalSettings globalSettings)
+        public GlobalSettings()
         {
-            SetDefaults(globalSettings);
+            SetDefaults();
         }
 
-        private void SetDefaults(GlobalSettings globalSettings)
+        private void SetDefaults()
         {
-            m_port = globalSettings.Port;
-            MulticastIP = globalSettings.MulticastIP;
-            ConnectionIP = globalSettings.ConnectionIP;
-            ChannelName = "";
-            Password = "";
-            DisplayName = globalSettings.DisplayName;
-            BaseColor = globalSettings.BaseColor;
-            PMColor = globalSettings.PMColor;
-            SystemMessageColor = globalSettings.SystemMessageColor;
-            if(globalSettings.Password != $"{globalSettings.MulticastIP}:{globalSettings.PortString}")
-            {
-                Password = globalSettings.Password;
-            }
+            m_port = 1314;
+            MulticastIP = "239.255.10.11";
+            ConnectionIP = "";
+            Password = $"{MulticastIP}:{m_port}";
+            DisplayName = "";
+            BaseColor = "white";
+            PMColor = "white";
+            SystemMessageColor = "white";
         }
 
-        public ChannelSettings(string channelinfo, GlobalSettings globalSettings)
+        public GlobalSettings(string channelinfo)
         {
-            SetDefaults(globalSettings);
+            SetDefaults();
 
-            string[] channelsplit = channelinfo.Split(new char[]{' '},StringSplitOptions.RemoveEmptyEntries);
-            for(int i = 0; i < channelsplit.Length; i++)
+            string[] channelsplit = channelinfo.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < channelsplit.Length; i++)
             {
-                if(channelsplit[i].StartsWith("-", StringComparison.Ordinal))
+                if (channelsplit[i].StartsWith("-", StringComparison.Ordinal))
                 {
                     var command = channelsplit[i].TrimStart('-');
-                    switch(command)
+                    switch (command)
                     {
-                        // Channel name value
-                        case "cn":
-                        case "channel":
-                            ChannelName = channelsplit[i + 1];
-                            break;
                         // Display name value
                         case "dn":
                         case "display":
@@ -150,12 +121,6 @@ namespace Chatr
                     }
                 }
             }
-            if(string.IsNullOrWhiteSpace(Password))
-            {
-                Password = $"{MulticastIP}:{Port}";
-            }
         }
-
-        
     }
 }

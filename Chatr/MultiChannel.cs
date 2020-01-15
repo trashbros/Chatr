@@ -6,7 +6,7 @@ namespace Chatr
 {
     public class MultiChannel
     {
-        public event EventHandler<string> MessageDisplayEventHandler;
+        public event EventHandler<string[]> MessageDisplayEventHandler;
 
         List<Channel> channelList;
 
@@ -14,6 +14,8 @@ namespace Chatr
         string globalConnectionIP = "localhost";
         string defaultPort = "1314";
         string defaultMulticast = "239.255.10.11";
+
+        GlobalSettings globalSettings;
 
         string m_filepath;
 
@@ -88,7 +90,7 @@ namespace Chatr
                     helptext += "\nThis software is provided under the GNU AGPL3.0 license.\n";
                     helptext += @"The source code can be found at https://github.com/trashbros/Chatr/";
                     helptext += "\n";
-                    DisplayMessage(helptext);
+                    DisplayMessage(helptext, globalSettings.SystemMessageColor);
                     break;
                 // Quit command
                 case CommandList.QUIT_S:
@@ -102,11 +104,11 @@ namespace Chatr
                     if (newchan > -1)
                     {
                         activeChannelIndex = newchan;
-                        DisplayMessage($"Connected to channel {channelname} for chatting.\n");
+                        DisplayMessage($"Connected to channel {channelname} for chatting.\n", globalSettings.SystemMessageColor);
                     }
                     else
                     {
-                        DisplayMessage($"No channel with name {channelname} could be found.\n");
+                        DisplayMessage($"No channel with name {channelname} could be found.\n", globalSettings.SystemMessageColor);
                     }
                     break;
                 // Change global username
@@ -150,7 +152,7 @@ namespace Chatr
 
         private void ConnectChannels(string message)
         {
-            DisplayMessage($"Looking for channels...\n");
+            DisplayMessage($"Looking for channels...\n", globalSettings.SystemMessageColor);
             bool channelfound = false;
             if (message.Trim() == CommandList.CONNECT)
             {
@@ -158,7 +160,7 @@ namespace Chatr
                 {
                     if(!channel.IsConnected)
                     {
-                        DisplayMessage($"Connecting to {channel.ChannelName}...\n");
+                        DisplayMessage($"Connecting to {channel.ChannelName}...\n", globalSettings.SystemMessageColor);
                         channel.Init();
                         channelfound = true;
                     }
@@ -172,7 +174,7 @@ namespace Chatr
                     var chan = channelList.FindIndex(c => c.ChannelName == cnames[i]);
                     if(!channelList[chan].IsConnected)
                     {
-                        DisplayMessage($"Connecting to {channelList[chan].ChannelName}...\n");
+                        DisplayMessage($"Connecting to {channelList[chan].ChannelName}...\n", globalSettings.SystemMessageColor);
                         channelList[chan].Init();
                         channelfound = true;
                     }
@@ -180,7 +182,7 @@ namespace Chatr
             }
             if(!channelfound)
             {
-                DisplayMessage($"No channels connected.\n");
+                DisplayMessage($"No channels connected.\n", globalSettings.SystemMessageColor);
             }
         }
 
@@ -213,13 +215,13 @@ namespace Chatr
         private void AddNewChannel(string message)
         {
             string channelinfo = message.Substring(CommandList.ADD_CHANNEL.Length + 1).Trim();
-            AddNewChannel(new ChannelSettings(channelinfo), false);
+            AddNewChannel(new ChannelSettings(channelinfo, globalSettings), false);
         }
 
         private void AddNewChannel(ChannelSettings channelSettings, bool silent = true)
         {
             // TODO: Add silent option to limit logging of channel connection stuff
-            channelList.Add(new Channel(SetGlobals(channelSettings)));
+            channelList.Add(new Channel(channelSettings));
             channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
             channelList[channelList.Count - 1].Init();
             
@@ -241,7 +243,7 @@ namespace Chatr
                     channelnames += $"{channel.ChannelName}\n";
                 }
             }
-            DisplayMessage(channelnames);
+            DisplayMessage(channelnames, globalSettings.SystemMessageColor);
         }
 
         private void PrintChannelInfo(string message)
@@ -250,11 +252,11 @@ namespace Chatr
             try
             {
                 var channelInfo = channelList.Find(channel => channel.ChannelName == channelName);
-                DisplayMessage(channelInfo.ToString());
+                DisplayMessage(channelInfo.ToString(), globalSettings.SystemMessageColor);
             }
             catch
             {
-                DisplayMessage("Not a valid channel name.\n");
+                DisplayMessage("Not a valid channel name.\n",globalSettings.SystemMessageColor);
             }
         }
 
@@ -262,9 +264,9 @@ namespace Chatr
         /// Wrapper function for invoking the message display event handler
         /// </summary>
         /// <param name="message"></param>
-        private void DisplayMessage(string message)
+        private void DisplayMessage(string message, string textColor)
         {
-            MessageDisplayEventHandler?.Invoke(this, message);
+            MessageDisplayEventHandler?.Invoke(this, new string[] { message, textColor });
         }
 
         /// <summary>
@@ -274,11 +276,15 @@ namespace Chatr
         private void ParseSettings(string filepath)
         {
             bool isglobal = true;
+            bool hasglobal = false;
             string line;
             string channelInfo = "";
+            List<string> channelstrings = new List<string>();
+            
 
             if(!System.IO.File.Exists(filepath))
             {
+                globalSettings = new GlobalSettings();
                 return;
             }
 
@@ -290,40 +296,32 @@ namespace Chatr
                 if (line == "[GLOBAL]")
                 {
                     isglobal = true;
+                    hasglobal = true;
                 }
                 else if (line == "[CHANNEL]")
                 {
-                    if (!isglobal)
+                    if(!isglobal && !hasglobal)
                     {
-                        ChannelSettings chanSet = SetGlobals(new ChannelSettings(channelInfo));
-                        channelList.Add(new Channel(chanSet));
+                        channelstrings.Add(channelInfo);
+                        channelInfo = "";
+                    }
+                    else if (!isglobal && hasglobal)
+                    {
+                        //ChannelSettings chanSet = new ChannelSettings(channelInfo, globalSettings);
+                        channelList.Add(new Channel(new ChannelSettings(channelInfo, globalSettings)));
                         channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
                         channelInfo = "";
                     }
-                    else
+                    else if(isglobal && !string.IsNullOrWhiteSpace(channelInfo))
                     {
                         isglobal = false;
+                        globalSettings = new GlobalSettings(channelInfo);
+                        channelInfo = "";
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(line) && line != "\n")
                 {
                     var args = line.Split(new char[] { ' ', '=' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (isglobal)
-                    {
-                        switch (args[0])
-                        {
-                            case "DisplayName":
-                                globalDisplayName = args[1].Replace(' ', '_');
-                                break;
-                            case "ConnectionIP":
-                                globalConnectionIP = args[1];
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else
-                    {
                         switch (args[0])
                         {
                             case "DisplayName":
@@ -344,10 +342,18 @@ namespace Chatr
                             case "ChannelName":
                                 channelInfo += $"-cn {args[1]} ";
                                 break;
+                        case "BaseColor":
+                            channelInfo += $"-bc {args[1]} ";
+                            break;
+                        case "PMColor":
+                            channelInfo += $"-pm {args[1]} ";
+                            break;
+                        case "SystemMessageColor":
+                            channelInfo += $"-sc {args[1]} ";
+                            break;
                             default:
                                 break;
                         }
-                    }
                 }
             }
 
@@ -355,9 +361,22 @@ namespace Chatr
 
             if(!isglobal && !string.IsNullOrWhiteSpace(channelInfo))
             {
-                ChannelSettings chanSet = SetGlobals(new ChannelSettings(channelInfo));
-                channelList.Add(new Channel(chanSet));
+                //ChannelSettings chanSet = SetGlobals(new ChannelSettings(channelInfo, globalSettings));
+                channelList.Add(new Channel(new ChannelSettings(channelInfo, globalSettings)));
                 channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
+            }
+            else if(isglobal && !string.IsNullOrWhiteSpace(channelInfo))
+            {
+                globalSettings = new GlobalSettings(channelInfo);
+            }
+
+            if(channelstrings.Count > 0)
+            {
+                foreach(var chan in channelstrings)
+                {
+                    channelList.Add(new Channel(new ChannelSettings(chan, globalSettings)));
+                    channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
+                }
             }
         }
 
@@ -366,8 +385,14 @@ namespace Chatr
 
             System.IO.StreamWriter file = new System.IO.StreamWriter(m_filepath, false);
             file.WriteLine("[GLOBAL]");
-            file.WriteLine($"DisplayName = {globalDisplayName}");
-            file.WriteLine($"ConnectionIP = {globalConnectionIP}");
+            file.WriteLine($"DisplayName = {globalSettings.DisplayName}");
+            file.WriteLine($"ConnectionIP = {globalSettings.ConnectionIP}");
+            file.WriteLine($"MulticastIP = {globalSettings.MulticastIP}");
+            file.WriteLine($"Port = {globalSettings.Port}");
+            file.WriteLine($"Password = {globalSettings.Password}");
+            file.WriteLine($"BaseColor = {globalSettings.BaseColor}");
+            file.WriteLine($"PMColor = {globalSettings.PMColor}");
+            file.WriteLine($"SystemMessageColor = {globalSettings.SystemMessageColor}");
             file.WriteLine("");
             foreach(var channel in channelList)
             {
@@ -392,6 +417,18 @@ namespace Chatr
                 if (channel.Password != $"{channel.MulticastIP}:{channel.Port}")
                 {
                     file.WriteLine($"Password = {channel.Password}");
+                }
+                if(channel.BaseColor != globalSettings.BaseColor)
+                {
+                    file.WriteLine($"BaseColor = {channel.BaseColor}");
+                }
+                if (channel.PMColor != globalSettings.PMColor)
+                {
+                    file.WriteLine($"PMColor = {channel.PMColor}");
+                }
+                if (channel.SystemMessageColor != globalSettings.SystemMessageColor)
+                {
+                    file.WriteLine($"SystemMessageColor = {channel.SystemMessageColor}");
                 }
                 file.WriteLine("");
             }
@@ -424,7 +461,7 @@ namespace Chatr
             }
             else
             {
-                DisplayMessage("No channel selected for sending\n");
+                DisplayMessage("No channel selected for sending\n", globalSettings.SystemMessageColor);
             }
         }
     }

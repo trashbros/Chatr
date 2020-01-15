@@ -77,7 +77,7 @@ namespace ChatrConsole
             // Attach a message display handler
             s_chatrClient.MessageDisplayEventHandler += (sender, m) =>
             {
-                DisplayMessage(m);
+                DisplayMessage(m[0],m[1]);
             };
         }
 
@@ -257,11 +257,18 @@ namespace ChatrConsole
         /// Display a recevied message
         /// </summary>
         /// <param name="message">Message to display</param>
-        static void DisplayMessage(string message)
+        static void DisplayMessage(string message, string textColor)
         {
             ClearInputLines();
-
-            Console.Write(message + "\n> " + s_nextInput);
+            ConsoleColor consoleColor;
+            if (Enum.TryParse<ConsoleColor>(textColor, true, out consoleColor))
+            {
+                Console.ForegroundColor = consoleColor;
+                //Console.Write($"Color is {textColor}\n>");
+            }
+            Console.Write(message); 
+            Console.ResetColor();
+            Console.Write("\n> " + s_nextInput);
         }
 
         /// <summary>

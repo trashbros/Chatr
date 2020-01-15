@@ -1,6 +1,12 @@
 [GLOBAL]
 DisplayName = Globalname
 ConnectionIP = XXX.XXX.XXX.XXX
+MulticastIP = 239.255.10.11
+Port = 1314
+Password = 239.255.10.11:1314
+BaseColor = white
+PMColor = magenta
+SystemMessageColor = yellow
 
 [CHANNEL]
 ChannelName = chan1
