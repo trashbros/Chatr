@@ -65,11 +65,11 @@ namespace Chatr
                     string helptext = "\n";
                     if (activeChannelIndex > -1)
                     {
-                        helptext = $"You are currently connected to {channelList[activeChannelIndex].ChannelName} \n";
+                        helptext = $"\nYou are currently chatting on {channelList[activeChannelIndex].ChannelName} as {channelList[activeChannelIndex].DisplayName} \n";
                     }
                     else
                     {
-                        helptext = "You are not currently connected to any channel \n";
+                        helptext = "You are not currently chatting on any channel \n";
                     }
                     helptext += "Command syntax and their function is listed below:\n\n";
                     helptext += $"/{CommandList.HELP}       or      /{CommandList.HELP_S}\n               Provides this help documentation\n";
@@ -142,13 +142,17 @@ namespace Chatr
 
         private void ConnectChannels(string message)
         {
+            DisplayMessage($"\nLooking for channels...\n");
+            bool channelfound = false;
             if (message.Trim() == CommandList.CONNECT)
             {
                 foreach (var channel in channelList)
                 {
                     if(!channel.IsConnected)
                     {
+                        DisplayMessage($"\nConnecting to {channel.ChannelName}...\n");
                         channel.Init();
+                        channelfound = true;
                     }
                 }
             }
@@ -160,9 +164,15 @@ namespace Chatr
                     var chan = channelList.FindIndex(c => c.ChannelName == cnames[i]);
                     if(!channelList[chan].IsConnected)
                     {
+                        DisplayMessage($"\nConnecting to {channelList[chan].ChannelName}...\n");
                         channelList[chan].Init();
+                        channelfound = true;
                     }
                 }
+            }
+            if(!channelfound)
+            {
+                DisplayMessage($"\nNo channels connected.\n");
             }
         }
 
