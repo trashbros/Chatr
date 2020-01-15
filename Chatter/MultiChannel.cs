@@ -10,7 +10,7 @@ namespace Chatter
 
         List<Channel> channelList;
 
-        string globalDisplayName = "";
+        string globalDisplayName = "user";
         string globalConnectionIP = "localhost";
 
         int activeChannelIndex = -1;
@@ -67,8 +67,18 @@ namespace Chatter
                 // Help request
                 case CommandList.HELP_S:
                 case CommandList.HELP:
-                    // MAke a string with info on all command options
-                    string helptext = $"\nYou are currently connected to {channelList[activeChannelIndex].ChannelName} \n Command syntax and their function is listed below:\n\n";
+
+                    // Make a string with info on all command options
+                    string helptext = "\n";
+                    if (activeChannelIndex > -1)
+                    {
+                        helptext = $"You are currently connected to {channelList[activeChannelIndex].ChannelName} \n";
+                    }
+                    else
+                    {
+                        helptext = "You are not currently connected to any channel \n";
+                    }
+                    helptext += "Command syntax and their function is listed below:\n\n";
                     helptext += $"/{CommandList.HELP}       or      /{CommandList.HELP_S}\n               Provides this help documentation\n";
                     helptext += $"/{CommandList.QUIT}       or      /{CommandList.QUIT_S}\n               Quit the application\n";
                     helptext += $"/{CommandList.USER_LIST}\n               Get a listing of users currently connected\n";
