@@ -11,32 +11,15 @@ Currently, only runs in a console and only provides conversation between all run
 - Run the EXE
 - Start chatting in the console window
 
-## Special Commands
-- Application Quit
-  
-    `/q`
-    `/quit`
+## Commands
+The following is a list of commands that may be used in the console.
 
-- Private Message
-
-    `/pm [username] [message]`
-
-- Active User List
-  
-    `/users`
-
-- Help
-
-    `/help` or `/h`
-
-- Name Change
-
-    `/name [new name]`
-
-- Multicast IP Change
-
-    `/multicast [new ip]`
-
-- Port Change
-
-    `/port [new port]`
+| Command                    | Description                                        |
+|----------------------------|----------------------------------------------------|
+| `/quit`, `/q`              | Quit applicaiton                                   |
+| `/pm [username] [message]` | Send a private message to  *username*              |
+| `/users`                   | List active users                                  |
+| `/help`, `/h`              | Display helpful informaion                         |
+| `/name [username]`         | Change current username to *username*              |
+| `/multicast [ip]`          | Change Multicast IP address to *ip*                |
+| `/port [port]`             | Change port number to *port*                       |
