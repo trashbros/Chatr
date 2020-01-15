@@ -12,6 +12,8 @@ namespace Chatr
 
         string globalDisplayName = "user";
         string globalConnectionIP = "localhost";
+        string defaultPort = "1314";
+        string defaultMulticast = "239.255.10.11";
 
         string m_filepath;
 
@@ -72,7 +74,7 @@ namespace Chatr
                     }
                     else
                     {
-                        helptext = "You are not currently chatting on any channel \n";
+                        helptext = "\nYou are not currently chatting on any channel \n";
                     }
                     helptext += "Command syntax and their function is listed below:\n\n";
                     helptext += $"/{CommandList.HELP}       or      /{CommandList.HELP_S}\n               Provides this help documentation\n";
@@ -100,11 +102,11 @@ namespace Chatr
                     if (newchan > -1)
                     {
                         activeChannelIndex = newchan;
-                        DisplayMessage($"\nConnected to channel {channelname} for chatting.\n");
+                        DisplayMessage($"Connected to channel {channelname} for chatting.\n");
                     }
                     else
                     {
-                        DisplayMessage($"\nNo channel with name {channelname} could be found.\n");
+                        DisplayMessage($"No channel with name {channelname} could be found.\n");
                     }
                     break;
                 // Change global username
@@ -122,6 +124,9 @@ namespace Chatr
                 // Add a channel
                 case CommandList.ADD_CHANNEL:
                     AddNewChannel(message);
+                    break;
+                // Edit a channel
+                case CommandList.EDIT_CHANNEL:
                     break;
                 // Get a listing of connected channels
                 case CommandList.CHANNEL_LIST:
@@ -145,7 +150,7 @@ namespace Chatr
 
         private void ConnectChannels(string message)
         {
-            DisplayMessage($"\nLooking for channels...\n");
+            DisplayMessage($"Looking for channels...\n");
             bool channelfound = false;
             if (message.Trim() == CommandList.CONNECT)
             {
@@ -153,7 +158,7 @@ namespace Chatr
                 {
                     if(!channel.IsConnected)
                     {
-                        DisplayMessage($"\nConnecting to {channel.ChannelName}...\n");
+                        DisplayMessage($"Connecting to {channel.ChannelName}...\n");
                         channel.Init();
                         channelfound = true;
                     }
@@ -167,7 +172,7 @@ namespace Chatr
                     var chan = channelList.FindIndex(c => c.ChannelName == cnames[i]);
                     if(!channelList[chan].IsConnected)
                     {
-                        DisplayMessage($"\nConnecting to {channelList[chan].ChannelName}...\n");
+                        DisplayMessage($"Connecting to {channelList[chan].ChannelName}...\n");
                         channelList[chan].Init();
                         channelfound = true;
                     }
@@ -175,7 +180,7 @@ namespace Chatr
             }
             if(!channelfound)
             {
-                DisplayMessage($"\nNo channels connected.\n");
+                DisplayMessage($"No channels connected.\n");
             }
         }
 
@@ -228,7 +233,7 @@ namespace Chatr
         private void PrintChannelList(string message)
         {
             bool allChannels = CommandList.CHANNEL_LIST.Length != message.Trim().Length;
-            string channelnames = "\nChannels are:\n";
+            string channelnames = "Channels are:\n";
             foreach (var channel in channelList)
             {
                 if (channel.IsConnected || allChannels)
@@ -262,6 +267,10 @@ namespace Chatr
             MessageDisplayEventHandler?.Invoke(this, message);
         }
 
+        /// <summary>
+        /// Parse the settings from your settings file and pass them as commands to add channels and globals
+        /// </summary>
+        /// <param name="filepath"></param>
         private void ParseSettings(string filepath)
         {
             bool isglobal = true;
@@ -364,11 +373,26 @@ namespace Chatr
             {
                 file.WriteLine("[CHANNEL]");
                 file.WriteLine($"ChannelName = {channel.ChannelName}");
-                file.WriteLine($"DisplayName = {channel.DisplayName}");
-                file.WriteLine($"ConnectionIP = {channel.ConnectionIP}");
-                file.WriteLine($"MulticastIP = {channel.MulticastIP}");
-                file.WriteLine($"Port = {channel.Port}");
-                file.WriteLine($"Password = {channel.Password}");
+                if ( channel.DisplayName != globalDisplayName)
+                {
+                    file.WriteLine($"DisplayName = {channel.DisplayName}");
+                }
+                if(channel.ConnectionIP != globalConnectionIP)
+                {
+                    file.WriteLine($"ConnectionIP = {channel.ConnectionIP}");
+                }
+                if(channel.MulticastIP != defaultMulticast)
+                {
+                    file.WriteLine($"MulticastIP = {channel.MulticastIP}");
+                }
+                if(channel.Port != defaultPort)
+                {
+                    file.WriteLine($"Port = {channel.Port}");
+                }
+                if (channel.Password != $"{channel.MulticastIP}:{channel.Port}")
+                {
+                    file.WriteLine($"Password = {channel.Password}");
+                }
                 file.WriteLine("");
             }
             file.Close();
@@ -400,7 +424,7 @@ namespace Chatr
             }
             else
             {
-                DisplayMessage("\nNo channel selected for sending\n");
+                DisplayMessage("No channel selected for sending\n");
             }
         }
     }

@@ -310,7 +310,7 @@ namespace Chatr
             string formattedString = message + " \n";
             string dateTime = DateTime.Now.ToString();
 
-            formattedString = $"< [{dateTime}] " + formattedString;
+            formattedString = $"< [{ChannelName}][{dateTime}] " + formattedString;
 
             if (notify)
             {

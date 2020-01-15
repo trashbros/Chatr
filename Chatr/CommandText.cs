@@ -24,5 +24,6 @@ namespace Chatr
         public const string CHANNEL_LIST = "list";
         public const string CHANNEL_INFO = "info";
         public const string CONNECT = "connect";
+        public const string EDIT_CHANNEL = "edit";
     }
 }
