@@ -260,8 +260,7 @@ namespace ChatrConsole
         static void DisplayMessage(string message, string textColor)
         {
             ClearInputLines();
-            ConsoleColor consoleColor;
-            if (Enum.TryParse<ConsoleColor>(textColor, true, out consoleColor))
+            if (Enum.TryParse<ConsoleColor>(textColor, true, out ConsoleColor consoleColor))
             {
                 Console.ForegroundColor = consoleColor;
                 //Console.Write($"Color is {textColor}\n>");
