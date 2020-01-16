@@ -10,7 +10,7 @@
     <PackageProjectUrl>https://github.com/trashbros/Chatr</PackageProjectUrl>
     <RepositoryUrl>https://github.com/trashbros/Chatr</RepositoryUrl>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <AssemblyVersion>0.0.0.2</AssemblyVersion>
+    <AssemblyVersion>0.0.0.3</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
