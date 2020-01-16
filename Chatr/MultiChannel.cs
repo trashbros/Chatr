@@ -76,20 +76,31 @@ namespace Chatr
                     }
                     else
                     {
-                        helptext = "\nYou are not currently chatting on any channel \n";
+                        helptext = "\nYou are not currently chatting on any channel \n\n";
                     }
-                    helptext += "Command syntax and their function is listed below:\n\n";
-                    helptext += $"/{CommandList.HELP}       or      /{CommandList.HELP_S}\n               Provides this help documentation\n";
-                    helptext += $"/{CommandList.QUIT}       or      /{CommandList.QUIT_S}\n               Quit the application\n";
-                    helptext += $"/{CommandList.USER_LIST}\n               Get a listing of users currently connected\n";
-                    helptext += $"/{CommandList.PM} [username] [message]\n               Message ONLY the specified user.\n";
-                    helptext += "               Does NOT inform if user not online\n";
-                    helptext += $"/{CommandList.CHANGE_NAME} [username]\n               Changes your currently display name\n";
-                    helptext += $"/{CommandList.CHANGE_MULTICAST} [IP address]\n               Changes to a different multicast group.\n";
-                    helptext += $"/{CommandList.CHANGE_PORT} [Port number]\n               Changes to a different port on the current multicast IP address\n";
-                    helptext += "\nThis software is provided under the GNU AGPL3.0 license.\n";
-                    helptext += @"The source code can be found at https://github.com/trashbros/Chatr/";
-                    helptext += "\n";
+                    helptext += $@"Command syntax and their function is listed below:
+
+| Command                    | Description                                        |
+|----------------------------|----------------------------------------------------|
+| /{CommandList.HELP}, /{CommandList.HELP_S}                  | Display this helpful informaion                    |
+| /{CommandList.QUIT}, /{CommandList.QUIT_S}                  | Quit applicaiton                                   |
+| /clear                     | Clear the console                                  |
+| /{CommandList.PM} [username] [message]   | Send a private message to [username]               |
+| /{CommandList.USER_LIST}                     | List active users                                  |
+| /{CommandList.CHANGE_NAME} [username]           | Change current username to [username]              |
+| /{CommandList.CHANGE_MULTICAST} [ip]            | Change Multicast IP address to [ip]                |
+| /{CommandList.CHANGE_PORT} [port]               | Change port number to [port]                       |
+| /{CommandList.CHANGE_PORT} [channel]            | Change active channel to [channel]                 |
+| /{CommandList.ADD_CHANNEL} [channel settings]    | Add a new channel using [channel settings]         |
+| /{CommandList.CHANNEL_LIST}                      | Get a listing of connected channels                |
+| /{CommandList.CHANNEL_INFO} [channel]            | Display information about [channel]                |
+| /{CommandList.CONNECT} [channel]         | Connect to [channel]                               |
+
+This software is provided under the GNU AGPL3.0 license.
+The source code can be found at https://github.com/trashbros/Chatr/
+
+";
+
                     DisplayMessage(helptext, globalSettings.SystemMessageColor);
                     break;
                 // Quit command
