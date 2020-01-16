@@ -234,6 +234,12 @@ namespace ChatrConsole
             // Get the message to return
             string message = s_currentInput;
 
+            // Clear the input command from the console
+            ClearInputLines();
+
+            // Display input prompt
+            Console.Write("> ");
+
             // Clear the input strings
             s_currentInput = string.Empty;
             s_nextInput = string.Empty;
