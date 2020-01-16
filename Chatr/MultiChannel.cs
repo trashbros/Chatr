@@ -90,7 +90,7 @@ namespace Chatr
 | /{CommandList.CHANGE_NAME} [username]           | Change current username to [username]              |
 | /{CommandList.CHANGE_MULTICAST} [ip]            | Change Multicast IP address to [ip]                |
 | /{CommandList.CHANGE_PORT} [port]               | Change port number to [port]                       |
-| /{CommandList.CHANGE_PORT} [channel]            | Change active channel to [channel]                 |
+| /{CommandList.CHANGE_CHANNEL} [channel]         | Change active channel to [channel]                 |
 | /{CommandList.ADD_CHANNEL} [channel settings]    | Add a new channel using [channel settings]         |
 | /{CommandList.CHANNEL_LIST}                      | Get a listing of connected channels                |
 | /{CommandList.CHANNEL_INFO} [channel]            | Display information about [channel]                |
@@ -98,7 +98,6 @@ namespace Chatr
 
 This software is provided under the GNU AGPL3.0 license.
 The source code can be found at https://github.com/trashbros/Chatr/
-
 ";
 
                     DisplayMessage(helptext, globalSettings.SystemMessageColor);
