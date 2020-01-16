@@ -45,7 +45,7 @@ jobs:
     - name: Build DocFX Documentaiton
       uses: nikeee/docfx-action@v0.1.0
       with:
-        args: "docgx.json"
+        args: "docfx.json"
     - name: Publish to github pages
       uses: maxheld83/ghpages@master
       env:
