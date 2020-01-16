@@ -190,6 +190,9 @@ namespace ChatrConsole
             s_currentInput = string.Empty;
             s_nextInput = string.Empty;
 
+            // Reset the history index
+            s_historyIndex = -1;
+
             // Read the first key from the console
             var key = Console.ReadKey(true);
 
@@ -198,9 +201,6 @@ namespace ChatrConsole
             {
                 // Intialize the next input to the current input
                 s_nextInput = s_currentInput;
-
-                // Reset the history index
-                s_historyIndex = -1;
 
                 // Check for a backspace
                 if (key.Key == ConsoleKey.Backspace && s_currentInput.Length > 0)
@@ -256,8 +256,11 @@ namespace ChatrConsole
                 key = Console.ReadKey(true);
             }
 
+            // Trim any whitespace off the command
+            s_currentInput = s_currentInput.Trim();
+
             // Check to see if we should add this input to the history
-            if (!string.IsNullOrEmpty(s_currentInput) && !s_messageHistory.Contains(s_currentInput))
+            if (!string.IsNullOrEmpty(s_currentInput) && (s_messageHistory.Count == 0 || !s_messageHistory[0].Equals(s_currentInput, StringComparison.Ordinal)))
             {
                 // Insert this input to the top of the history
                 s_messageHistory.Insert(0, s_currentInput);
