@@ -42,4 +42,13 @@ jobs:
         asset_path: ./ChatrConsole-${{ steps.tagName.outputs.tag }}.zip
         asset_name: ChatrConsole-${{ steps.tagName.outputs.tag }}.zip
         asset_content_type: application/zip
-       
+    - name: Build DocFX Documentaiton
+      uses: nikeee/docfx-action@v0.1.0
+      with:
+        args: "docgx.json"
+    - name: Publish to github pages
+      uses: maxheld83/ghpages@master
+      env:
+        BUILD_DIR: _site
+        GH_PAT: ${{ secrets.GH_PAT }}
+
