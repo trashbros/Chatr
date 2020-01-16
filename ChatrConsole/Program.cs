@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace ChatrConsole
 {
@@ -95,8 +96,8 @@ namespace ChatrConsole
             // Loop while it isn't the quit message
             while (!IsQuitMessage(message))
             {
-                // Check to see if user actually entered something
-                if (!string.IsNullOrEmpty(message))
+                // Try and process it as console command first
+                if (!TryProcessAsConsoleCommand(message))
                 {
                     // Send the message to the client
                     s_chatrClient.SendMessage(message);
@@ -105,6 +106,37 @@ namespace ChatrConsole
                 // Read the next message
                 message = ReadMessage();
             };
+        }
+
+        /// <summary>
+        /// Try to process the message as a console command
+        /// </summary>
+        /// <param name="message">Message to process</param>
+        /// <returns>true if the command was handled, otherwise false</returns>
+        static bool TryProcessAsConsoleCommand(string message)
+        {
+            // Check for empty message
+            if (string.IsNullOrEmpty(message))
+            {
+                // Do nothing
+
+                // command handled
+                return true;
+            }
+
+            // Check for the clear command
+            if (message.StartsWith("/clear", true, CultureInfo.CurrentCulture))
+            {
+                // Clear the console and display the prompt
+                Console.Clear();
+                Console.Write("> ");
+
+                // command handled
+                return true;
+            }
+
+            // command not handled
+            return false;
         }
 
         /// <summary>
