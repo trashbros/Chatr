@@ -16,27 +16,30 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 
 namespace ChatrConsole
 {
-    class Program
+    internal class Program
     {
         #region Fields
-        static string s_currentInput = string.Empty;
-        static string s_nextInput = string.Empty;
-        static readonly List<string> s_messageHistory = new List<string>();
-        static int s_historyIndex = -1;
-        static Chatr.MultiChannel s_chatrClient;
+
+        private static string s_currentInput = string.Empty;
+        private static string s_nextInput = string.Empty;
+        private static readonly List<string> s_messageHistory = new List<string>();
+        private static int s_historyIndex = -1;
+        private static Chatr.MultiChannel s_chatrClient;
+
         #endregion Fields
 
         /// <summary>
         /// Entry point of the program.
         /// </summary>
         /// <param name="args">Command line arguments</param>
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             // Display the assembly version information
             DisplayVersion();
@@ -57,7 +60,7 @@ namespace ChatrConsole
         /// <summary>
         /// Display the assembly version information
         /// </summary>
-        static void DisplayVersion()
+        private static void DisplayVersion()
         {
             // Get the version from currently executing assembly
             string assVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -70,7 +73,7 @@ namespace ChatrConsole
         ///  Start a new Chatr client using the settings from <paramref name="settingsPath"/>
         /// </summary>
         /// <param name="settingsPath">File path to chatr settings file</param>
-        static void StartupChatr(string settingsPath)
+        private static void StartupChatr(string settingsPath)
         {
             // Create a new Chatr client
             s_chatrClient = new Chatr.MultiChannel(settingsPath);
@@ -78,14 +81,14 @@ namespace ChatrConsole
             // Attach a message display handler
             s_chatrClient.MessageDisplayEventHandler += (sender, m) =>
             {
-                DisplayMessage(m[0],m[1]);
+                DisplayMessage(m[0], m[1]);
             };
         }
 
         /// <summary>
         /// Read messages entered by the user and send them to the client util the user enters the quit message
         /// </summary>
-        static void ReadAndProcessMessagesUntilQuit()
+        private static void ReadAndProcessMessagesUntilQuit()
         {
             // Display intial prompt
             Console.Write("\n> ");
@@ -113,7 +116,7 @@ namespace ChatrConsole
         /// </summary>
         /// <param name="message">Message to process</param>
         /// <returns>true if the command was handled, otherwise false</returns>
-        static bool TryProcessAsConsoleCommand(string message)
+        private static bool TryProcessAsConsoleCommand(string message)
         {
             // Check for empty message
             if (string.IsNullOrEmpty(message))
@@ -142,7 +145,7 @@ namespace ChatrConsole
         /// <summary>
         /// Shutdown the Chatr client
         /// </summary>
-        static void ShutdownChatr()
+        private static void ShutdownChatr()
         {
             s_chatrClient?.ShutDown();
             s_chatrClient = null;
@@ -154,7 +157,7 @@ namespace ChatrConsole
         /// </summary>
         /// <param name="settingsPath">Settings path to use</param>
         /// <returns></returns>
-        static string GetSettingsPath(string settingsPath)
+        private static string GetSettingsPath(string settingsPath)
         {
             // Default path in case supplied path is invalid
             string path = System.IO.Path.GetFullPath(".chatrconfig");
@@ -174,7 +177,7 @@ namespace ChatrConsole
         /// </summary>
         /// <param name="pathString">Path to validate</param>
         /// <returns>true if path is rooted, local path, false otherwise</returns>
-        static bool IsPathValidRootedLocal(String pathString)
+        private static bool IsPathValidRootedLocal(String pathString)
         {
             bool isValidUri = Uri.TryCreate(pathString, UriKind.Absolute, out Uri pathUri);
             return isValidUri && pathUri != null && pathUri.IsLoopback;
@@ -184,7 +187,7 @@ namespace ChatrConsole
         /// Read a message from the console
         /// </summary>
         /// <returns>Message that was read</returns>
-        static string ReadMessage()
+        private static string ReadMessage()
         {
             // Clear input strings
             s_currentInput = string.Empty;
@@ -197,7 +200,7 @@ namespace ChatrConsole
             var key = Console.ReadKey(true);
 
             // Loop until the ENTER key is pressed
-            while( key.Key != ConsoleKey.Enter)
+            while (key.Key != ConsoleKey.Enter)
             {
                 // Intialize the next input to the current input
                 s_nextInput = s_currentInput;
@@ -288,7 +291,7 @@ namespace ChatrConsole
         /// </summary>
         /// <param name="message">Message to check</param>
         /// <returns></returns>
-        static bool IsQuitMessage(string message)
+        private static bool IsQuitMessage(string message)
         {
             string text = message.ToLower(System.Globalization.CultureInfo.CurrentCulture).TrimStart('/');
             return (text == Chatr.CommandList.QUIT || text == Chatr.CommandList.QUIT_S);
@@ -298,7 +301,7 @@ namespace ChatrConsole
         /// Display a recevied message
         /// </summary>
         /// <param name="message">Message to display</param>
-        static void DisplayMessage(string message, string textColor)
+        private static void DisplayMessage(string message, string textColor)
         {
             ClearInputLines();
             if (Enum.TryParse<ConsoleColor>(textColor, true, out ConsoleColor consoleColor))
@@ -306,7 +309,7 @@ namespace ChatrConsole
                 Console.ForegroundColor = consoleColor;
                 //Console.Write($"Color is {textColor}\n>");
             }
-            Console.Write(message); 
+            Console.Write(message);
             Console.ResetColor();
             Console.Write("\n> " + s_nextInput);
         }
@@ -314,7 +317,7 @@ namespace ChatrConsole
         /// <summary>
         /// Display the message input from the user
         /// </summary>
-        static void DisplayInput()
+        private static void DisplayInput()
         {
             // Clear the previous message input
             ClearInputLines();
@@ -326,7 +329,7 @@ namespace ChatrConsole
         /// <summary>
         /// Clear any user message input from the display
         /// </summary>
-        static void ClearInputLines()
+        private static void ClearInputLines()
         {
             Console.SetCursorPosition(0, Console.CursorTop - 1 * ((s_currentInput.Length + 1) / Console.WindowWidth));
             Console.Write(new string(' ', s_currentInput.Length + 2));

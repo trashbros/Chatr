@@ -1,5 +1,5 @@
 ﻿/*
-Primary channel command and logic control interface. 
+Primary channel command and logic control interface.
 Creates and connects to client isntance
 Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
 
@@ -16,19 +16,18 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using System.Globalization;
-using System.Security.Cryptography;
 
 namespace Chatr
 {
     public class Channel
     {
         #region Properties
-        public string ChannelName {get {return channelSettings.ChannelName;} }
+
+        public string ChannelName { get { return channelSettings.ChannelName; } }
         public string DisplayName { get { return channelSettings.DisplayName; } }
         public string ConnectionIP { get { return channelSettings.ConnectionIP; } }
         public string MulticastIP { get { return channelSettings.MulticastIP; } }
@@ -37,28 +36,36 @@ namespace Chatr
         public string BaseColor { get { return channelSettings.BaseColor; } }
         public string PMColor { get { return channelSettings.PMColor; } }
         public string SystemMessageColor { get { return channelSettings.SystemMessageColor; } }
-        public bool IsConnected { 
-            get { 
-                if(chatrClient != null)
+
+        public bool IsConnected
+        {
+            get
+            {
+                if (chatrClient != null)
                 {
                     return chatrClient.ReceiveStarted;
                 }
-                return false; 
-            } 
+                return false;
+            }
         }
-        #endregion
+
+        #endregion Properties
 
         #region Events
+
         public event EventHandler<string[]> MessageDisplayEventHandler;
-        #endregion
+
+        #endregion Events
 
         #region Private Member Variables
-        Client chatrClient;
 
-        ChannelSettings channelSettings;
+        private Client chatrClient;
 
-        List<string> m_onlineUsers;
-        #endregion
+        private ChannelSettings channelSettings;
+
+        private List<string> m_onlineUsers;
+
+        #endregion Private Member Variables
 
         /// <summary>
         /// Class Initialization function. Gets log in info
@@ -72,6 +79,7 @@ namespace Chatr
         }
 
         #region Public Functions
+
         /// <summary>
         /// Public class for initializing the connection and beginning messaging
         /// </summary>
@@ -108,7 +116,8 @@ namespace Chatr
             chatrClient?.Dispose();
             chatrClient = null;
         }
-        #endregion
+
+        #endregion Public Functions
 
         /// <summary>
         /// Function for connecting to the actually multicast client
@@ -158,7 +167,7 @@ namespace Chatr
             else
             {
                 // Display the message
-                DisplayMessage(FormatMessageText($"{ senderName }: { text }", (senderName != channelSettings.DisplayName)),BaseColor);
+                DisplayMessage(FormatMessageText($"{ senderName }: { text }", (senderName != channelSettings.DisplayName)), BaseColor);
             }
         }
 
@@ -167,7 +176,7 @@ namespace Chatr
         /// </summary>
         /// <param name="message"></param>
         /// <param name="senderName"></param>
-        void HandleIncomingCommandText(string message, string senderName)
+        private void HandleIncomingCommandText(string message, string senderName)
         {
             string command = message.Split(' ')[0];
             switch (command.ToLower())
@@ -179,13 +188,13 @@ namespace Chatr
                     {
                         // Display the message
                         text = text.Substring(channelSettings.DisplayName.Length + 1);
-                        DisplayMessage(FormatMessageText($"[PM]{ senderName }: { text.Trim() }", true),PMColor);
+                        DisplayMessage(FormatMessageText($"[PM]{ senderName }: { text.Trim() }", true), PMColor);
                     }
                     else if (string.Compare(senderName, channelSettings.DisplayName, StringComparison.Ordinal) == 0)
                     {
                         string name = text.Split(' ')[0];
                         text = text.Substring(name.Length + 1);
-                        DisplayMessage(FormatMessageText($"[PM]{ senderName } to { name }: { text.Trim() }", false),PMColor);
+                        DisplayMessage(FormatMessageText($"[PM]{ senderName } to { name }: { text.Trim() }", false), PMColor);
                     }
                     break;
                 // Active user return message
@@ -220,7 +229,7 @@ namespace Chatr
                     {
                         m_onlineUsers.Remove(senderName);
                         m_onlineUsers.Add(newName);
-                        DisplayMessage(FormatMessageText($"[{ senderName } has changed to {newName}]"),SystemMessageColor);
+                        DisplayMessage(FormatMessageText($"[{ senderName } has changed to {newName}]"), SystemMessageColor);
                     }
                     break;
                 // Not a valid command, just go ahead and display it
@@ -277,7 +286,7 @@ namespace Chatr
                 case CommandList.CHANGE_PORT:
                     var portString = message.Substring(CommandList.CHANGE_PORT.Length + 1);
                     channelSettings.PortString = portString;
-                    if(channelSettings.PortString != portString)
+                    if (channelSettings.PortString != portString)
                     {
                         DisplayMessage("Invalid port number provided!\n", SystemMessageColor);
                     }
@@ -329,26 +338,25 @@ namespace Chatr
             // Check that our multicast IP is good
             if (!Helpers.IsValidIP(channelSettings.MulticastIP))
             {
-                DisplayMessage("Invalid multicast IP provided!\n",SystemMessageColor);
+                DisplayMessage("Invalid multicast IP provided!\n", SystemMessageColor);
                 return;
             }
 
             if (chatrClient != null)
             {
                 ShutDown();
-
             }
             ConnectClient();
-            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelSettings.MulticastIP}\nPort: {channelSettings.Port.ToString()}\n**************\n",SystemMessageColor);
+            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelSettings.MulticastIP}\nPort: {channelSettings.Port.ToString()}\n**************\n", SystemMessageColor);
         }
 
         /// <summary>
         /// Wrapper function for invoking the message display event handler
         /// </summary>
         /// <param name="message"></param>
-        private void DisplayMessage(string message,string textColor)
+        private void DisplayMessage(string message, string textColor)
         {
-            MessageDisplayEventHandler?.Invoke(this, new string[]{ message,textColor});
+            MessageDisplayEventHandler?.Invoke(this, new string[] { message, textColor });
         }
 
         public override string ToString()
@@ -357,14 +365,14 @@ namespace Chatr
             channelDetails += $"\nChannel Name: {channelSettings.ChannelName}\nDisplayName: {channelSettings.DisplayName}\n";
             channelDetails += $"Local IP: {channelSettings.ConnectionIP}\nMutlicast IP: {channelSettings.MulticastIP}\n";
             channelDetails += $"Port: {channelSettings.PortString}\nPassword: {channelSettings.Password}\n\n";
-            
+
             string userText = "Active users are:\n";
             foreach (var user in m_onlineUsers)
             {
                 userText += user + "\n";
             }
 
-            return channelDetails+userText;
+            return channelDetails + userText;
         }
     }
 }

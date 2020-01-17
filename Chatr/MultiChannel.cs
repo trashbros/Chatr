@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Chatr
 {
@@ -8,18 +7,18 @@ namespace Chatr
     {
         public event EventHandler<string[]> MessageDisplayEventHandler;
 
-        List<Channel> channelList;
+        private List<Channel> channelList;
 
-        string globalDisplayName = "user";
-        string globalConnectionIP = "localhost";
-        string defaultPort = "1314";
-        string defaultMulticast = "239.255.10.11";
+        private string globalDisplayName = "user";
+        private string globalConnectionIP = "localhost";
+        private string defaultPort = "1314";
+        private string defaultMulticast = "239.255.10.11";
 
-        GlobalSettings globalSettings;
+        private GlobalSettings globalSettings;
 
-        string m_filepath;
+        private string m_filepath;
 
-        int activeChannelIndex = -1;
+        private int activeChannelIndex = -1;
 
         public MultiChannel(string filepath)
         {
@@ -124,7 +123,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 // Change global username
                 case CommandList.CHANGE_NAME:
                     var text = message.Substring(CommandList.CHANGE_NAME.Length + 1);
-                    if(text.Contains(" -g "))
+                    if (text.Contains(" -g "))
                     {
                         // TODO: Add global username change in here
                     }
@@ -168,7 +167,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
             {
                 foreach (var channel in channelList)
                 {
-                    if(!channel.IsConnected)
+                    if (!channel.IsConnected)
                     {
                         DisplayMessage($"Connecting to {channel.ChannelName}...\n", globalSettings.SystemMessageColor);
                         channel.Init();
@@ -182,7 +181,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 for (int i = 1; i < cnames.Length; i++)
                 {
                     var chan = channelList.FindIndex(c => c.ChannelName == cnames[i]);
-                    if(!channelList[chan].IsConnected)
+                    if (!channelList[chan].IsConnected)
                     {
                         DisplayMessage($"Connecting to {channelList[chan].ChannelName}...\n", globalSettings.SystemMessageColor);
                         channelList[chan].Init();
@@ -190,7 +189,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     }
                 }
             }
-            if(!channelfound)
+            if (!channelfound)
             {
                 DisplayMessage($"No channels connected.\n", globalSettings.SystemMessageColor);
             }
@@ -234,7 +233,6 @@ The source code can be found at https://github.com/trashbros/Chatr/
             channelList.Add(new Channel(channelSettings));
             channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
             channelList[channelList.Count - 1].Init();
-            
         }
 
         private void DeleteChannel()
@@ -266,7 +264,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
             }
             catch
             {
-                DisplayMessage("Not a valid channel name.\n",globalSettings.SystemMessageColor);
+                DisplayMessage("Not a valid channel name.\n", globalSettings.SystemMessageColor);
             }
         }
 
@@ -290,15 +288,14 @@ The source code can be found at https://github.com/trashbros/Chatr/
             string line;
             string channelInfo = "";
             List<string> channelstrings = new List<string>();
-            
 
-            if(!System.IO.File.Exists(filepath))
+            if (!System.IO.File.Exists(filepath))
             {
                 globalSettings = new GlobalSettings();
                 return;
             }
 
-            // Read the file and display it line by line.  
+            // Read the file and display it line by line.
             System.IO.StreamReader file =
                 new System.IO.StreamReader(filepath);
             while ((line = file.ReadLine()) != null)
@@ -310,7 +307,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 }
                 else if (line == "[CHANNEL]")
                 {
-                    if(!isglobal && !hasglobal)
+                    if (!isglobal && !hasglobal)
                     {
                         channelstrings.Add(channelInfo);
                         channelInfo = "";
@@ -322,7 +319,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                         channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
                         channelInfo = "";
                     }
-                    else if(isglobal && !string.IsNullOrWhiteSpace(channelInfo))
+                    else if (isglobal && !string.IsNullOrWhiteSpace(channelInfo))
                     {
                         isglobal = false;
                         globalSettings = new GlobalSettings(channelInfo);
@@ -332,57 +329,66 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 else if (!string.IsNullOrWhiteSpace(line) && line != "\n")
                 {
                     var args = line.Split(new char[] { ' ', '=' }, StringSplitOptions.RemoveEmptyEntries);
-                        switch (args[0])
-                        {
-                            case "DisplayName":
-                                channelInfo += $"-dn {args[1]} ";
-                                break;
-                            case "ConnectionIP":
-                                channelInfo += $"-lip {args[1]} ";
-                                break;
-                            case "MulticastIP":
-                                channelInfo += $"-mip {args[1]} ";
-                                break;
-                            case "Port":
-                                channelInfo += $"-p {args[1]} ";
-                                break;
-                            case "Password":
-                                channelInfo += $"-pw {args[1]} ";
-                                break;
-                            case "ChannelName":
-                                channelInfo += $"-cn {args[1]} ";
-                                break;
+                    switch (args[0])
+                    {
+                        case "DisplayName":
+                            channelInfo += $"-dn {args[1]} ";
+                            break;
+
+                        case "ConnectionIP":
+                            channelInfo += $"-lip {args[1]} ";
+                            break;
+
+                        case "MulticastIP":
+                            channelInfo += $"-mip {args[1]} ";
+                            break;
+
+                        case "Port":
+                            channelInfo += $"-p {args[1]} ";
+                            break;
+
+                        case "Password":
+                            channelInfo += $"-pw {args[1]} ";
+                            break;
+
+                        case "ChannelName":
+                            channelInfo += $"-cn {args[1]} ";
+                            break;
+
                         case "BaseColor":
                             channelInfo += $"-bc {args[1]} ";
                             break;
+
                         case "PMColor":
                             channelInfo += $"-pm {args[1]} ";
                             break;
+
                         case "SystemMessageColor":
                             channelInfo += $"-sc {args[1]} ";
                             break;
-                            default:
-                                break;
-                        }
+
+                        default:
+                            break;
+                    }
                 }
             }
 
             file.Close();
 
-            if(!isglobal && !string.IsNullOrWhiteSpace(channelInfo))
+            if (!isglobal && !string.IsNullOrWhiteSpace(channelInfo))
             {
                 //ChannelSettings chanSet = SetGlobals(new ChannelSettings(channelInfo, globalSettings));
                 channelList.Add(new Channel(new ChannelSettings(channelInfo, globalSettings)));
                 channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
             }
-            else if(isglobal && !string.IsNullOrWhiteSpace(channelInfo))
+            else if (isglobal && !string.IsNullOrWhiteSpace(channelInfo))
             {
                 globalSettings = new GlobalSettings(channelInfo);
             }
 
-            if(channelstrings.Count > 0)
+            if (channelstrings.Count > 0)
             {
-                foreach(var chan in channelstrings)
+                foreach (var chan in channelstrings)
                 {
                     channelList.Add(new Channel(new ChannelSettings(chan, globalSettings)));
                     channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
@@ -392,7 +398,6 @@ The source code can be found at https://github.com/trashbros/Chatr/
 
         private void CreateSettingsFile()
         {
-
             System.IO.StreamWriter file = new System.IO.StreamWriter(m_filepath, false);
             file.WriteLine("[GLOBAL]");
             file.WriteLine($"DisplayName = {globalSettings.DisplayName}");
@@ -404,23 +409,23 @@ The source code can be found at https://github.com/trashbros/Chatr/
             file.WriteLine($"PMColor = {globalSettings.PMColor}");
             file.WriteLine($"SystemMessageColor = {globalSettings.SystemMessageColor}");
             file.WriteLine("");
-            foreach(var channel in channelList)
+            foreach (var channel in channelList)
             {
                 file.WriteLine("[CHANNEL]");
                 file.WriteLine($"ChannelName = {channel.ChannelName}");
-                if ( channel.DisplayName != globalDisplayName)
+                if (channel.DisplayName != globalDisplayName)
                 {
                     file.WriteLine($"DisplayName = {channel.DisplayName}");
                 }
-                if(channel.ConnectionIP != globalConnectionIP)
+                if (channel.ConnectionIP != globalConnectionIP)
                 {
                     file.WriteLine($"ConnectionIP = {channel.ConnectionIP}");
                 }
-                if(channel.MulticastIP != defaultMulticast)
+                if (channel.MulticastIP != defaultMulticast)
                 {
                     file.WriteLine($"MulticastIP = {channel.MulticastIP}");
                 }
-                if(channel.Port != defaultPort)
+                if (channel.Port != defaultPort)
                 {
                     file.WriteLine($"Port = {channel.Port}");
                 }
@@ -428,7 +433,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 {
                     file.WriteLine($"Password = {channel.Password}");
                 }
-                if(channel.BaseColor != globalSettings.BaseColor)
+                if (channel.BaseColor != globalSettings.BaseColor)
                 {
                     file.WriteLine($"BaseColor = {channel.BaseColor}");
                 }

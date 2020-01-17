@@ -15,9 +15,8 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Chatr
 {
@@ -29,6 +28,7 @@ namespace Chatr
         private string m_displayName;
         public string ConnectionIP { get; set; }
         public string MulticastIP { get; set; }
+
         public string PortString
         {
             get
@@ -43,6 +43,7 @@ namespace Chatr
                 }
             }
         }
+
         public int Port
         {
             get
@@ -57,6 +58,7 @@ namespace Chatr
                 }
             }
         }
+
         private int m_port = 1314;
         public string Password { get; set; }
         public string BaseColor { get; set; }
@@ -79,7 +81,7 @@ namespace Chatr
             BaseColor = globalSettings.BaseColor;
             PMColor = globalSettings.PMColor;
             SystemMessageColor = globalSettings.SystemMessageColor;
-            if(globalSettings.Password != $"{globalSettings.MulticastIP}:{globalSettings.PortString}")
+            if (globalSettings.Password != $"{globalSettings.MulticastIP}:{globalSettings.PortString}")
             {
                 Password = globalSettings.Password;
             }
@@ -89,13 +91,13 @@ namespace Chatr
         {
             SetDefaults(globalSettings);
 
-            string[] channelsplit = channelinfo.Split(new char[]{' '},StringSplitOptions.RemoveEmptyEntries);
-            for(int i = 0; i < channelsplit.Length; i++)
+            string[] channelsplit = channelinfo.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < channelsplit.Length; i++)
             {
-                if(channelsplit[i].StartsWith("-", StringComparison.Ordinal))
+                if (channelsplit[i].StartsWith("-", StringComparison.Ordinal))
                 {
                     var command = channelsplit[i].TrimStart('-');
-                    switch(command)
+                    switch (command)
                     {
                         // Channel name value
                         case "cn":
@@ -145,17 +147,16 @@ namespace Chatr
                         case "systemcolor":
                             SystemMessageColor = channelsplit[i + 1];
                             break;
+
                         default:
                             break;
                     }
                 }
             }
-            if(string.IsNullOrWhiteSpace(Password))
+            if (string.IsNullOrWhiteSpace(Password))
             {
                 Password = $"{MulticastIP}:{Port}";
             }
         }
-
-        
     }
 }

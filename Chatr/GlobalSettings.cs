@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Chatr
 {
@@ -10,6 +8,7 @@ namespace Chatr
         private string m_displayName;
         public string ConnectionIP { get; set; }
         public string MulticastIP { get; set; }
+
         public string PortString
         {
             get
@@ -24,6 +23,7 @@ namespace Chatr
                 }
             }
         }
+
         public int Port
         {
             get
@@ -38,6 +38,7 @@ namespace Chatr
                 }
             }
         }
+
         private int m_port = 1314;
         public string Password { get; set; }
         public string BaseColor { get; set; }
@@ -116,6 +117,7 @@ namespace Chatr
                         case "systemcolor":
                             SystemMessageColor = channelsplit[i + 1];
                             break;
+
                         default:
                             break;
                     }

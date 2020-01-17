@@ -15,6 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -25,24 +26,31 @@ namespace Chatr
     public class Client : IDisposable
     {
         #region Properties
+
         public IPAddress LocalIP { get; }
         public IPAddress MulticastIP { get; }
         public int Port { get; }
         public IMessageTransform MessageTransform { get; }
+
         public bool ReceiveStarted
         {
             get => _receiveSocket != null;
         }
-        #endregion
+
+        #endregion Properties
 
         #region Events
+
         public event EventHandler<MessageReceivedEventArgs> MessageReceivedEventHandler;
-        #endregion
+
+        #endregion Events
 
         #region Private member variables
+
         private Socket _receiveSocket;
         private bool _disposed = false;
-        #endregion
+
+        #endregion Private member variables
 
         public Client(IPAddress localIP, IPAddress multicastIP, int port, IMessageTransform messageTransform)
         {
@@ -153,6 +161,7 @@ namespace Chatr
         }
 
         #region IDisposable Support
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -170,6 +179,7 @@ namespace Chatr
         {
             Dispose(true);
         }
-        #endregion
+
+        #endregion IDisposable Support
     }
 }

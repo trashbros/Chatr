@@ -21,7 +21,7 @@ using System.Text;
 
 namespace Chatr
 {
-    class Base64MessageTransform : IMessageTransform
+    internal class Base64MessageTransform : IMessageTransform
     {
         public string Decode(byte[] encodedMessage)
         {
