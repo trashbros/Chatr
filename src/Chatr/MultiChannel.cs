@@ -9,11 +9,6 @@ namespace Chatr
 
         private List<Channel> channelList;
 
-        private string globalDisplayName = "user";
-        private string globalConnectionIP = "localhost";
-        private string defaultPort = "1314";
-        private string defaultMulticast = "239.255.10.11";
-
         private GlobalSettings globalSettings;
 
         private string m_filepath;
@@ -427,19 +422,19 @@ The source code can be found at https://github.com/trashbros/Chatr/
             {
                 file.WriteLine("[CHANNEL]");
                 file.WriteLine($"ChannelName = {channel.ChannelName}");
-                if (channel.DisplayName != globalDisplayName)
+                if (channel.DisplayName != globalSettings.DisplayName)
                 {
                     file.WriteLine($"DisplayName = {channel.DisplayName}");
                 }
-                if (channel.ConnectionIP != globalConnectionIP)
+                if (channel.ConnectionIP != globalSettings.ConnectionIP)
                 {
                     file.WriteLine($"ConnectionIP = {channel.ConnectionIP}");
                 }
-                if (channel.MulticastIP != defaultMulticast)
+                if (channel.MulticastIP != globalSettings.MulticastIP)
                 {
                     file.WriteLine($"MulticastIP = {channel.MulticastIP}");
                 }
-                if (channel.Port != defaultPort)
+                if (channel.Port != globalSettings.PortString)
                 {
                     file.WriteLine($"Port = {channel.Port}");
                 }
@@ -462,23 +457,6 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 file.WriteLine("");
             }
             file.Close();
-        }
-
-        private ChannelSettings SetGlobals(ChannelSettings channelSettings)
-        {
-            if (string.IsNullOrWhiteSpace(channelSettings.DisplayName))
-            {
-                channelSettings.DisplayName = globalDisplayName;
-            }
-            if (string.IsNullOrWhiteSpace(channelSettings.ChannelName))
-            {
-                // TODO: Handle missing channel name... Generate name? Or abort?
-            }
-            if (string.IsNullOrWhiteSpace(channelSettings.ConnectionIP))
-            {
-                channelSettings.ConnectionIP = globalConnectionIP;
-            }
-            return channelSettings;
         }
 
         /// <summary>  This is a passthrough function to pass</summary>
