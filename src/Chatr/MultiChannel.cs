@@ -396,6 +396,20 @@ The source code can be found at https://github.com/trashbros/Chatr/
             }
         }
 
+        /// <summary>
+        ///   <para>
+        ///  Creates the settings file.</para>
+        ///   <para>
+        ///     <font color="#333333">From the internally held global settings data and the internally held list of channels and their settings data, this generates the .chatrconfig file.</font>
+        ///   </para>
+        ///   <para>
+        ///     <font color="#333333">This class then takes that file data and writes it to the default .chatrconfig location (next to the program .exe) or if a path was provided at startup, it will write the file to that path instead.</font>
+        ///   </para>
+        ///   <para>
+        ///     <font color="#333333">
+        ///       <strong>NOTE:</strong> This function is called on shutdown of the multichannel class, and silently overwrites any file at the existing location. This is how the program stores and saves any changes made while running Chatr.</font>
+        ///   </para>
+        /// </summary>
         private void CreateSettingsFile()
         {
             System.IO.StreamWriter file = new System.IO.StreamWriter(m_filepath, false);
@@ -467,6 +481,8 @@ The source code can be found at https://github.com/trashbros/Chatr/
             return channelSettings;
         }
 
+        /// <summary>  This is a passthrough function to pass</summary>
+        /// <param name="message">The message.</param>
         private void PassMessage(string message)
         {
             // Send The message

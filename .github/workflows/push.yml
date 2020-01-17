@@ -1,0 +1,21 @@
+on:
+  push:
+name: Update documentation
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Build DocFX Documentaiton
+      uses: nikeee/docfx-action@v0.1.0
+      with:
+        args: "docfx.json"
+    - name: Publish to github pages
+      uses: crazy-max/ghaction-github-pages@v1.2.5
+      with:
+        target_branch: gh-pages
+        build_dir: _site
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

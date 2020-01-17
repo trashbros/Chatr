@@ -52,6 +52,11 @@ namespace Chatr
 
         #endregion Private member variables
 
+        /// <summary>Initializes a new instance of the <see cref="Client"/> class.</summary>
+        /// <param name="localIP">The local ip.</param>
+        /// <param name="multicastIP">The multicast ip.</param>
+        /// <param name="port">The port.</param>
+        /// <param name="messageTransform">The message transform.</param>
         public Client(IPAddress localIP, IPAddress multicastIP, int port, IMessageTransform messageTransform)
         {
             LocalIP = localIP;
@@ -60,6 +65,8 @@ namespace Chatr
             MessageTransform = messageTransform;
         }
 
+        /// <summary>Starts the receiving.</summary>
+        /// <exception cref="ClientAlreadyReceivingException"></exception>
         public async Task StartReceiving()
         {
             if (_receiveSocket != null)
