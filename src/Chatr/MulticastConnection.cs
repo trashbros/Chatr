@@ -48,21 +48,140 @@ namespace Chatr
         private readonly IPEndPoint _multicastEndPoint;
 
         /// <summary>
-        /// UdpClient for sending data.
-        /// </summary>
-        private readonly UdpClient _sendClient;
-
-        /// <summary>
         /// Has Disposed already been called?
         /// </summary>
-        private bool _disposed = false;
+        private bool _disposed;
 
         /// <summary>
         /// The socket used for receiving data.
         /// </summary>
-        private Socket _receiveSocket;
+        private Socket _recvSocket;
+
+        /// <summary>
+        /// The task the receive loop is running on.
+        /// </summary>
+        private Task _recvTask;
+
+        /// <summary>
+        /// UdpClient for sending data.
+        /// </summary>
+        private UdpClient _sendClient;
+
+        /// <summary>
+        /// Flag to tell the recevie task that it needs to shutdown.
+        /// </summary>
+        private bool _shutdown;
 
         #endregion Private Fields
+
+        #region Private Methods
+
+        /// <summary>
+        /// Sends the specified message.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="checkActive">
+        /// if set to <c>true</c> check to see if connection is active before sending.
+        /// </param>
+        private void Send(string message, bool checkActive)
+        {
+            if (!checkActive || Active)
+            {
+                byte[] datagram = _messageTransform.Encode(message);
+
+                try
+                {
+                    if (_sendClient == null)
+                    {
+                        _sendClient = new UdpClient(new IPEndPoint(_localIP, 0));
+                    }
+
+                    _sendClient.Send(datagram, datagram.Length, _multicastEndPoint);
+                }
+                catch (SocketException)
+                {
+                    _sendClient?.Dispose();
+                    _sendClient = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Start receiving messages in a separate task.
+        /// </summary>
+        /// <exception cref="AlreadyReceivingException">Recveving has already been started.</exception>
+        private async Task StartReceiving()
+        {
+            try
+            {
+                using (_recvSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+                {
+                    _recvSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    _recvSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 250);
+                    _recvSocket.Bind(new IPEndPoint(IPAddress.Any, _multicastEndPoint.Port));
+                    _recvSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(_multicastEndPoint.Address, _localIP));
+
+                    IPEndPoint remoteIPEndPoint = new IPEndPoint(_multicastEndPoint.Address, 0);
+                    EndPoint remoteEndPoint = remoteIPEndPoint;
+
+                    await Task.Run(() =>
+                    {
+                        while (!_shutdown)
+                        {
+                            byte[] datagram = new byte[65536];
+                            int length = 0;
+
+                            Active = true;
+
+                            try
+                            {
+                                length = _recvSocket.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
+                            }
+                            catch (SocketException e)
+                            {
+                                if (e.SocketErrorCode == SocketError.TimedOut)
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    throw e;
+                                }
+                            }
+
+                            Array.Resize(ref datagram, length);
+
+                            string message = null;
+                            try
+                            {
+                                message = _messageTransform.Decode(datagram);
+                            }
+                            catch (Exception)
+                            {
+                                // Exception trying to decode the message. Silently ignore it
+                            }
+
+                            if (message != null)
+                            {
+                                MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
+                            }
+                        }
+
+                        _shutdown = false;
+                    });
+                }
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                Active = false;
+            }
+        }
+
+        #endregion Private Methods
 
         #region Protected Methods
 
@@ -79,7 +198,7 @@ namespace Chatr
             {
                 if (disposing)
                 {
-                    StopReceiving();
+                    Disconnect();
 
                     _sendClient.Close();
                 }
@@ -107,7 +226,6 @@ namespace Chatr
             _localIP = localIP;
             _multicastEndPoint = multicastEndPoint;
             _messageTransform = messageTransform;
-            _sendClient = new UdpClient(new IPEndPoint(_localIP, 0));
         }
 
         #endregion Public Constructors
@@ -122,6 +240,12 @@ namespace Chatr
         #endregion Public Events
 
         #region Public Properties
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="MulticastConnection"/> is active.
+        /// </summary>
+        /// <value><c>true</c> if active; otherwise, <c>false</c>.</value>
+        public bool Active { get; private set; }
 
         /// <summary>
         /// Gets the local IP address being used by this connection.
@@ -141,18 +265,32 @@ namespace Chatr
             get => new IPEndPoint(new IPAddress(_multicastEndPoint.Address.GetAddressBytes()), _multicastEndPoint.Port);
         }
 
-        /// <summary>
-        /// Gets a value indicating whether receive has started on this connection.
-        /// </summary>
-        /// <value><c>true</c> if receive has started; otherwise, <c>false</c>.</value>
-        public bool ReceiveStarted
-        {
-            get; private set;
-        }
-
         #endregion Public Properties
 
         #region Public Methods
+
+        /// <summary>
+        /// Connect to the multicast end point.
+        /// </summary>
+        public void Connect()
+        {
+            Disconnect();
+
+            _recvTask = StartReceiving();
+        }
+
+        /// <summary>
+        /// Disconnect from the multicast end point.
+        /// </summary>
+        public void Disconnect()
+        {
+            if (_recvTask != null)
+            {
+                _shutdown = true;
+                _recvTask.Wait();
+                _recvTask = null;
+            }
+        }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting
@@ -169,100 +307,7 @@ namespace Chatr
         /// <param name="message">The message.</param>
         public void Send(string message)
         {
-            byte[] datagram = _messageTransform.Encode(message);
-
-            try
-            {
-                _sendClient.Send(datagram, datagram.Length, _multicastEndPoint);
-            }
-            catch (SocketException e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
-        /// <summary>
-        /// Start receiving messages.
-        /// </summary>
-        /// <exception cref="AlreadyReceivingException">Recveving has already been started.</exception>
-        public async Task StartReceiving()
-        {
-            if (ReceiveStarted)
-            {
-                throw new AlreadyReceivingException();
-            }
-
-            try
-            {
-                using (_receiveSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
-                {
-                    _receiveSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                    _receiveSocket.Bind(new IPEndPoint(IPAddress.Any, _multicastEndPoint.Port));
-                    _receiveSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(_multicastEndPoint.Address, _localIP));
-
-                    IPEndPoint remoteIPEndPoint = new IPEndPoint(_multicastEndPoint.Address, 0);
-                    EndPoint remoteEndPoint = remoteIPEndPoint;
-
-                    await Task.Run(() =>
-                    {
-                        try
-                        {
-                            ReceiveStarted = true;
-
-                            while (true)
-                            {
-                                byte[] datagram = new byte[65536];
-                                int length = _receiveSocket.ReceiveFrom(datagram, 0, datagram.Length, SocketFlags.None, ref remoteEndPoint);
-                                Array.Resize(ref datagram, length);
-
-                                string message = null;
-                                try
-                                {
-                                    message = _messageTransform.Decode(datagram);
-                                }
-                                catch (Exception)
-                                {
-                                    // Exception trying to decode the message. Silently ignore it
-                                }
-
-                                if (message != null)
-                                {
-                                    MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
-                                }
-                            }
-                        }
-                        catch (SocketException e)
-                        {
-                            if (e.SocketErrorCode != SocketError.Shutdown)
-                            {
-                                throw e;
-                            }
-                        }
-                    });
-                }
-            }
-            catch (SocketException e)
-            {
-                StopReceiving();
-                Console.WriteLine(e);
-            }
-        }
-
-        /// <summary>
-        /// Stop receiving.
-        /// </summary>
-        public void StopReceiving()
-        {
-            try
-            {
-                _receiveSocket?.Shutdown(SocketShutdown.Receive);
-                _receiveSocket?.Close();
-                ReceiveStarted = false;
-            }
-            catch (SocketException e)
-            {
-                Console.WriteLine(e);
-            }
+            Send(message, false);
         }
 
         #endregion Public Methods

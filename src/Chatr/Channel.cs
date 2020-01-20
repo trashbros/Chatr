@@ -43,7 +43,7 @@ namespace Chatr
             {
                 if (connection != null)
                 {
-                    return connection.ReceiveStarted;
+                    return connection.Active;
                 }
                 return false;
             }
@@ -135,17 +135,17 @@ namespace Chatr
                 HandleMessagingCalls(m);
             };
 
-            // Start task to receive messages
-            _ = connection.StartReceiving();
+            // Connect
+            connection.Connect();
 
-            // Add self as an online user
-            m_onlineUsers.Add(channelSettings.DisplayName);
-
-            // Wait to make sure we're actually recieving messages
-            while (!connection.ReceiveStarted)
+            // Wait for the connection to become active
+            while (!connection.Active)
             {
                 System.Threading.Thread.Sleep(100);
             }
+
+            // Add self as an online user
+            m_onlineUsers.Add(channelSettings.DisplayName);
 
             // Then send the log on command
             this.SendMessage("/" + CommandList.LOGON);
