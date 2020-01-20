@@ -17,7 +17,7 @@ namespace Chatr
             }
             set
             {
-                if (Helpers.IsValidPort(value, out int port))
+                if (Helpers.TryParsePort(value, out int port))
                 {
                     m_port = port;
                 }

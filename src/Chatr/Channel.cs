@@ -276,7 +276,7 @@ namespace Chatr
                 // Change your multicast ip address
                 case CommandList.CHANGE_MULTICAST:
                     var newIP = message.Substring(CommandList.CHANGE_MULTICAST.Length + 1);
-                    if (!Helpers.IsValidIP(newIP))
+                    if (!Helpers.IsValidMulticastIP(newIP))
                     {
                         DisplayMessage("Multicast IP is not valid\n", SystemMessageColor);
                     }
@@ -340,7 +340,7 @@ namespace Chatr
                 return;
             }
             // Check that our multicast IP is good
-            if (!Helpers.IsValidIP(channelSettings.MulticastIP))
+            if (!Helpers.IsValidMulticastIP(channelSettings.MulticastIP))
             {
                 DisplayMessage("Invalid multicast IP provided!\n", SystemMessageColor);
                 return;

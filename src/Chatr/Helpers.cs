@@ -1,5 +1,6 @@
 ﻿/*
-Static class of functions used in multiple classes
+Static helper functions used in multiple classes.
+
 Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
 
 This program is free software: you can redistribute it and/or modify
@@ -21,49 +22,88 @@ using System.Net;
 
 namespace Chatr
 {
+    /// <summary>
+    /// Static helper funcitons used in multiple classes.
+    /// </summary>
     public static class Helpers
     {
-        /// <summary>
-        /// Helper function to check if the port is a real port
-        /// </summary>
-        /// <param name="portString"></param>
-        /// <param name="portNum"></param>
-        /// <returns></returns>
-        public static bool IsValidPort(string portString, out int portNum)
-        {
-            if (!Int32.TryParse(portString, out portNum))
-            {
-                return false;
-            }
+        #region Public Methods
 
-            return IsValidPort(portNum);
+        /// <summary>
+        /// Determines whether a string is a valid IP address.
+        /// </summary>
+        /// <param name="ipString">The string to validate.</param>
+        /// <returns><c>true</c> if ipString is a valid IP address; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="ipString"/> is null.</exception>
+        public static bool IsValidIP(string ipString)
+        {
+            return IPAddress.TryParse(ipString, out _);
         }
 
         /// <summary>
-        /// Helper function to check if the port is a real port
+        /// Determines whether a string is a valid multicast IP address.
         /// </summary>
-        /// <param name="port"></param>
-        /// <returns></returns>
+        /// <param name="ipAddress"></param>
+        /// <returns><c>true</c> if ipString is a valid Multicast IP address; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="ipString"/> is null.</exception>
+        public static bool IsValidMulticastIP(string ipAddress)
+        {
+            if (IPAddress.TryParse(ipAddress, out IPAddress address))
+            {
+                byte firstOctet = address.GetAddressBytes()[0];
+
+                return firstOctet >= 224 && firstOctet <= 239;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the specifed port number is valid.
+        /// </summary>
+        /// <param name="port">The port number.</param>
+        /// <returns>
+        /// <c>true</c> if <paramref name="port"/> is in the range 1024 - 65535; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsValidPort(int port)
         {
-            if (port < 0 || port > 65535)
-            {
-                return false;
-            }
-
-            return true;
+            return port > 1023 && port < 65536;
         }
 
         /// <summary>
-        /// Helper function to check if the IP can be parsed
+        /// Converts the string representation of a port number to its integer equivalent. A return
+        /// value indicates whether the operation succeeded.
         /// </summary>
-        /// <param name="ipAdress"></param>
-        /// <returns></returns>
-        public static bool IsValidIP(string ipAdress)
+        /// <param name="portString">A string containing a port number to convert.</param>
+        /// <param name="port">
+        /// When this method returns, contains the integer equivalent of the port number containted
+        /// in <paramref name="portString"/>, if the conversion succeeded, or zero if the conversion
+        /// failed. The conversion fails if the <paramref name="portString"/> is null or <see
+        /// cref="string.Empty"/>, is not the correct format, or represents a number in the range
+        /// 1024 - 65535. This parameter is passed uninitialized; any value originally supplied in
+        /// port will be overwritten.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if <paramref name="portString"/> was converted successfully; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool TryParsePort(string portString, out int port)
         {
-            if (!IPAddress.TryParse(ipAdress, out _))
-            { return false; }
-            return true;
+            if (Int32.TryParse(portString, out port))
+            {
+                if (IsValidPort(port))
+                {
+                    return true;
+                }
+                else
+                {
+                    port = 0;
+                    return false;
+                }
+            }
+
+            return false;
         }
+
+        #endregion Public Methods
     }
 }
