@@ -28,7 +28,7 @@ namespace Chatr
     /// Connection for sending and receiving messages over multicast UDP sockets.
     /// </summary>
     /// <seealso cref="System.IDisposable"/>
-    public class Connection : IDisposable
+    public class MulticastConnection : IDisposable
     {
         #region Private Fields
 
@@ -93,7 +93,7 @@ namespace Chatr
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Connection"/> class.
+        /// Initializes a new instance of the <see cref="MulticastConnection"/> class.
         /// </summary>
         /// <param name="localIP">The local IP address to use for sending and receiving data.</param>
         /// <param name="multicastEndPoint">
@@ -102,7 +102,7 @@ namespace Chatr
         /// <param name="messageTransform">
         /// The message transform to use when sending and receiving data.
         /// </param>
-        public Connection(IPAddress localIP, IPEndPoint multicastEndPoint, IMessageTransform messageTransform)
+        public MulticastConnection(IPAddress localIP, IPEndPoint multicastEndPoint, IMessageTransform messageTransform)
         {
             _localIP = localIP;
             _multicastEndPoint = multicastEndPoint;

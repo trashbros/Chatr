@@ -59,7 +59,7 @@ namespace Chatr
 
         #region Private Member Variables
 
-        private Connection connection;
+        private MulticastConnection connection;
 
         private readonly ChannelSettings channelSettings;
 
@@ -127,7 +127,7 @@ namespace Chatr
             var messageTransform = new PasswordEncryptedMessageTransform(channelSettings.Password, "AES");
 
             // Create a new connection
-            connection = new Connection(IPAddress.Parse(channelSettings.ConnectionIP), new IPEndPoint(IPAddress.Parse(channelSettings.MulticastIP), channelSettings.Port), messageTransform);
+            connection = new MulticastConnection(IPAddress.Parse(channelSettings.ConnectionIP), new IPEndPoint(IPAddress.Parse(channelSettings.MulticastIP), channelSettings.Port), messageTransform);
 
             // Attach a message handler
             connection.MessageReceivedEventHandler += (sender, m) =>
