@@ -1,5 +1,6 @@
 ﻿/*
-Encode/Decode messages to/from Base64 strings
+Encode/Decode messages to/from Base64.
+
 Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
 
 This program is free software: you can redistribute it and/or modify
@@ -21,16 +22,34 @@ using System.Text;
 
 namespace Chatr
 {
+    /// <summary>
+    /// Encode/Decode messages to/from Base64.
+    /// </summary>
+    /// <seealso cref="Chatr.IMessageTransform"/>
     internal class Base64MessageTransform : IMessageTransform
     {
+        #region Public Methods
+
+        /// <summary>
+        /// Decodes the specified Base64 encoded message.
+        /// </summary>
+        /// <param name="encodedMessage">The Base64 encoded message.</param>
+        /// <returns>Decoded message.</returns>
         public string Decode(byte[] encodedMessage)
         {
             return Encoding.UTF8.GetString(Convert.FromBase64String(Encoding.UTF8.GetString(encodedMessage)));
         }
 
+        /// <summary>
+        /// Encodes the specified message to Base64.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns>Base64 encoded message.</returns>
         public byte[] Encode(string message)
         {
             return Encoding.UTF8.GetBytes(Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
         }
+
+        #endregion Public Methods
     }
 }

@@ -1,5 +1,6 @@
 ﻿/*
-Encode/Decode messages using a password based symmetric encryption algorithm
+Encode/Decode messages using a password-based symmetric encryption algorithm.
+
 Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
 
 This program is free software: you can redistribute it and/or modify
@@ -23,28 +24,60 @@ using System.Security.Cryptography;
 
 namespace Chatr
 {
+    /// <summary>
+    /// Encode/Decode password encrypted messages.
+    /// </summary>
+    /// <seealso cref="Chatr.IMessageTransform"/>
     internal class PasswordEncryptedMessageTransform : IMessageTransform
     {
-        private readonly Rfc2898DeriveBytes _deriveBytes;
+        #region Private Fields
+
+        /// <summary>
+        /// The name of the encryption algorithm to use.
+        /// </summary>
         private readonly string _algName;
 
+        /// <summary>
+        /// Password based key derivation function.
+        /// </summary>
+        private readonly Rfc2898DeriveBytes _deriveBytes;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PasswordEncryptedMessageTransform"/> class
+        /// using the specified password and encryption algorithm.
+        /// </summary>
+        /// <param name="password">The password to use.</param>
+        /// <param name="algName">Name of the encryption algorithm to use.</param>
         public PasswordEncryptedMessageTransform(string password, string algName)
         {
             _deriveBytes = new Rfc2898DeriveBytes(password, SymmetricAlgorithm.Create(algName).BlockSize / 8);
             _algName = algName;
         }
 
-        public string Decode(byte[] encodedMessage)
+        #endregion Public Constructors
+
+        #region Public Methods
+
+        /// <summary>
+        /// Decodes the specified encrypted message.
+        /// </summary>
+        /// <param name="encryptedMessage">The encrypted message.</param>
+        /// <returns>Decoded message.</returns>
+        public string Decode(byte[] encryptedMessage)
         {
             string message = null;
 
             using (var algorithm = SymmetricAlgorithm.Create(_algName))
             {
                 byte[] iv = new byte[algorithm.BlockSize / 8];
-                byte[] cipherText = new byte[encodedMessage.Length - iv.Length];
+                byte[] cipherText = new byte[encryptedMessage.Length - iv.Length];
 
-                Array.Copy(encodedMessage, 0, iv, 0, iv.Length);
-                Array.Copy(encodedMessage, iv.Length, cipherText, 0, cipherText.Length);
+                Array.Copy(encryptedMessage, 0, iv, 0, iv.Length);
+                Array.Copy(encryptedMessage, iv.Length, cipherText, 0, cipherText.Length);
 
                 _deriveBytes.Salt = iv;
                 algorithm.IV = iv;
@@ -66,9 +99,14 @@ namespace Chatr
             return message;
         }
 
+        /// <summary>
+        /// Encrypts the specified message.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns>Encrypted message.</returns>
         public byte[] Encode(string message)
         {
-            byte[] encrypted;
+            byte[] encryptedMessage;
 
             using (var algorithm = SymmetricAlgorithm.Create(_algName))
             {
@@ -86,12 +124,14 @@ namespace Chatr
                             swEncrypt.Write(message);
                         }
 
-                        encrypted = algorithm.IV.Concat(msEncrypt.ToArray()).ToArray();
+                        encryptedMessage = algorithm.IV.Concat(msEncrypt.ToArray()).ToArray();
                     }
                 }
             }
 
-            return encrypted;
+            return encryptedMessage;
         }
+
+        #endregion Public Methods
     }
 }
