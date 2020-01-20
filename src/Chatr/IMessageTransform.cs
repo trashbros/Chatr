@@ -1,5 +1,6 @@
 ﻿/*
-Interface that provides methods to encode and decode messages
+Interface that provides methods to encode and decode messages.
+
 Copyright (C) 2020  Trash Bros (BlinkTheThings, Reakain)
 
 This program is free software: you can redistribute it and/or modify
@@ -18,10 +19,27 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace Chatr
 {
+    /// <summary>
+    /// Interface that provides methods to encode and decode messages.
+    /// </summary>
     public interface IMessageTransform
     {
+        #region Public Methods
+
+        /// <summary>
+        /// Decodes the specified encoded message.
+        /// </summary>
+        /// <param name="encodedMessage">The encoded message.</param>
+        /// <returns>Decoded message.</returns>
+        string Decode(byte[] encodedMessage);
+
+        /// <summary>
+        /// Encodes the specified message.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns>Encoded message.</returns>
         byte[] Encode(string message);
 
-        string Decode(byte[] encodedMessage);
+        #endregion Public Methods
     }
 }
