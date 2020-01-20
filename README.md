@@ -2,16 +2,11 @@
 Internal server-less chat client for communicating between development machines.
 Currently, only runs in a console and only provides conversation between all running clients indiscriminantly.
 
-## Build Instructions
-- Requires .NET Core 3.0 SDK
-- Visual Studio 2019
-- Startup project is ChatrConsole
-
 ## Usage Instructions
 - Run the ChatrConsole executable
 - Start chatting in the console window
 
-## Commands
+### Commands
 The following is a list of commands that may be used in the console.
 
 | Command                    | Description                                        |
@@ -28,3 +23,6 @@ The following is a list of commands that may be used in the console.
 | `/list`                    | Get a listing of connected channels                |
 | `/info [channel]`          | Display information about *channel*                |
 | `/connect [channel]`       | Connect to *channel*                               |
+
+## Build Instructions
+Chatr can easily be built from source using several methods and platforms. See [BUILDING.md](BUILDING.md) for details.
