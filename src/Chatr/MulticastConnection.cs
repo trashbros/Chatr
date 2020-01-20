@@ -109,7 +109,6 @@ namespace Chatr
         /// <summary>
         /// Start receiving messages in a separate task.
         /// </summary>
-        /// <exception cref="AlreadyReceivingException">Recveving has already been started.</exception>
         private async Task StartReceiving()
         {
             try
