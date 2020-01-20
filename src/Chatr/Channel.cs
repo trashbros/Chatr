@@ -61,9 +61,9 @@ namespace Chatr
 
         private Client chatrClient;
 
-        private ChannelSettings channelSettings;
+        private readonly ChannelSettings channelSettings;
 
-        private List<string> m_onlineUsers;
+        private readonly List<string> m_onlineUsers;
 
         #endregion Private Member Variables
 

@@ -7,11 +7,11 @@ namespace Chatr
     {
         public event EventHandler<string[]> MessageDisplayEventHandler;
 
-        private List<Channel> channelList;
+        private readonly List<Channel> channelList;
 
         private GlobalSettings globalSettings;
 
-        private string m_filepath;
+        private readonly string m_filepath;
 
         private int activeChannelIndex = -1;
 
@@ -222,7 +222,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
             AddNewChannel(new ChannelSettings(channelinfo, globalSettings), false);
         }
 
-        private void AddNewChannel(ChannelSettings channelSettings, bool silent = true)
+        private void AddNewChannel(ChannelSettings channelSettings, bool _ /* silent = true */)
         {
             // TODO: Add silent option to limit logging of channel connection stuff
             channelList.Add(new Channel(channelSettings));
@@ -230,10 +230,12 @@ The source code can be found at https://github.com/trashbros/Chatr/
             channelList[channelList.Count - 1].Init();
         }
 
+        /* TODO: Implement DeleteChannel
         private void DeleteChannel()
         {
-            // TODO: Entirely remove channel
+            // Entirely remove channel
         }
+        */
 
         private void PrintChannelList(string message)
         {

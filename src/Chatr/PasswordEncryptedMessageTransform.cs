@@ -25,8 +25,8 @@ namespace Chatr
 {
     internal class PasswordEncryptedMessageTransform : IMessageTransform
     {
-        private Rfc2898DeriveBytes _deriveBytes;
-        private string _algName;
+        private readonly Rfc2898DeriveBytes _deriveBytes;
+        private readonly string _algName;
 
         public PasswordEncryptedMessageTransform(string password, string algName)
         {
