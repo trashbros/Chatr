@@ -41,9 +41,9 @@ namespace Chatr
         {
             get
             {
-                if (chatrClient != null)
+                if (connection != null)
                 {
-                    return chatrClient.ReceiveStarted;
+                    return connection.ReceiveStarted;
                 }
                 return false;
             }
@@ -59,7 +59,7 @@ namespace Chatr
 
         #region Private Member Variables
 
-        private Client chatrClient;
+        private Connection connection;
 
         private readonly ChannelSettings channelSettings;
 
@@ -103,52 +103,56 @@ namespace Chatr
             else
             {
                 // Send The message
-                chatrClient?.Send(channelSettings.DisplayName + ">" + message);
+                connection?.Send(channelSettings.DisplayName + ">" + message);
             }
         }
 
         /// <summary>
-        /// Command to call to shutdown the controller and internal client on program close.
+        /// Command to call to shutdown the controller and internal connection on program close.
         /// </summary>
         public void ShutDown()
         {
             this.SendMessage("/" + CommandList.QUIT);
-            chatrClient?.Dispose();
-            chatrClient = null;
+            connection?.Dispose();
+            connection = null;
         }
 
         #endregion Public Functions
 
         /// <summary>
-        /// Function for connecting to the actually multicast client
+        /// Create a connection with the current channel settings
         /// </summary>
         private void ConnectClient()
         {
             var messageTransform = new PasswordEncryptedMessageTransform(channelSettings.Password, "AES");
 
-            // Create a new Chatr client
-            chatrClient = new Client(IPAddress.Parse(channelSettings.ConnectionIP), IPAddress.Parse(channelSettings.MulticastIP), channelSettings.Port, messageTransform);
+            // Create a new connection
+            connection = new Connection(IPAddress.Parse(channelSettings.ConnectionIP), new IPEndPoint(IPAddress.Parse(channelSettings.MulticastIP), channelSettings.Port), messageTransform);
 
             // Attach a message handler
-            chatrClient.MessageReceivedEventHandler += (sender, m) =>
+            connection.MessageReceivedEventHandler += (sender, m) =>
             {
                 HandleMessagingCalls(m);
             };
 
             // Start task to receive messages
-            _ = chatrClient.StartReceiving();
+            _ = connection.StartReceiving();
 
             // Add self as an online user
             m_onlineUsers.Add(channelSettings.DisplayName);
 
             // Wait to make sure we're actually recieving messages
-            System.Threading.Thread.Sleep(2000);
+            while (!connection.ReceiveStarted)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+
             // Then send the log on command
             this.SendMessage("/" + CommandList.LOGON);
         }
 
         /// <summary>
-        /// Our incoming message handling class the recieves messages from the multicast client
+        /// Our incoming message handling class the recieves messages from the multicast connection
         /// </summary>
         /// <param name="m"></param>
         private void HandleMessagingCalls(MessageReceivedEventArgs m)
@@ -219,7 +223,7 @@ namespace Chatr
                     {
                         m_onlineUsers.Add(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"), SystemMessageColor);
-                        chatrClient?.Send(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName);
+                        connection?.Send(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName);
                     }
                     break;
                 // Notified a user changed their display name
@@ -251,7 +255,7 @@ namespace Chatr
                 // Quit command
                 case CommandList.QUIT_S:
                 case CommandList.QUIT:
-                    chatrClient?.Send(channelSettings.DisplayName + ">/" + CommandList.LOGOFF);
+                    connection?.Send(channelSettings.DisplayName + ">/" + CommandList.LOGOFF);
                     m_onlineUsers.Clear();
                     break;
                 // Active user list request
@@ -266,7 +270,7 @@ namespace Chatr
                 // Change your display name
                 case CommandList.CHANGE_NAME:
                     string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1);
-                    chatrClient?.Send(channelSettings.DisplayName + ">/" + CommandList.NAME_CHANGED + " " + newName);
+                    connection?.Send(channelSettings.DisplayName + ">/" + CommandList.NAME_CHANGED + " " + newName);
                     channelSettings.DisplayName = newName;
                     break;
                 // Change your multicast ip address
@@ -298,7 +302,7 @@ namespace Chatr
                 // Not a valid command string
                 default:
                     // Send The message
-                    chatrClient?.Send(channelSettings.DisplayName + ">/" + message);
+                    connection?.Send(channelSettings.DisplayName + ">/" + message);
                     break;
             }
         }
@@ -325,7 +329,7 @@ namespace Chatr
         }
 
         /// <summary>
-        /// Disconnect any existing client and connect new client
+        /// Disconnect any existing connection and create a new connection
         /// </summary>
         private void NewClientConnection()
         {
@@ -342,7 +346,7 @@ namespace Chatr
                 return;
             }
 
-            if (chatrClient != null)
+            if (connection != null)
             {
                 ShutDown();
             }

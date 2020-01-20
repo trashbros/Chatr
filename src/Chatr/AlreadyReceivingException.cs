@@ -19,18 +19,18 @@ using System;
 
 namespace Chatr
 {
-    public class ClientAlreadyReceivingException : Exception
+    public class AlreadyReceivingException : Exception
     {
-        public ClientAlreadyReceivingException()
+        public AlreadyReceivingException()
         {
         }
 
-        public ClientAlreadyReceivingException(string message)
+        public AlreadyReceivingException(string message)
             : base(message)
         {
         }
 
-        public ClientAlreadyReceivingException(string message, Exception inner)
+        public AlreadyReceivingException(string message, Exception inner)
             : base(message, inner)
         {
         }
