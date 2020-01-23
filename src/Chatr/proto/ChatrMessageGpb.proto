@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package Chatr;
+
+message ChatrMessage {
+    message TextMessage {
+        string text = 1;
+    }
+
+    message LogOnMessage {
+	}
+
+    message LogOffMessage {
+	}
+
+    message AwayMessage {
+        string text = 1;
+    }
+
+    message EchoMessage {
+        enum EchoType {
+            UNKNOWN  = 0;
+            REQUEST  = 1;
+            RESPONSE = 2;
+		}
+        EchoType type = 1;
+	}
+
+    message RenameMessage {
+        string name = 1;
+	}
+
+    uint32 protocol_version = 1;
+	string source           = 2;
+	string destination      = 3;
+
+    oneof sub_message {
+        TextMessage   text_message    = 4;
+        LogOnMessage  log_on_message  = 5; 
+        LogOffMessage log_off_message = 6; 
+        AwayMessage   away_message    = 7;
+        EchoMessage   echo_message    = 8;
+        RenameMessage rename_message  = 9;
+    }
+}

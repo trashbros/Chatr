@@ -10,4 +10,13 @@
     <DefineConstants />
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.11.2" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.11.2" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="$(protoc_windows64) --proto_path=$(ProjectDir)\proto --csharp_out=$(ProjectDir) $(ProjectDir)\proto\*.proto" />
+  </Target>
+
 </Project>
