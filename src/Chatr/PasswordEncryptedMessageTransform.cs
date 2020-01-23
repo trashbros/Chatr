@@ -67,9 +67,9 @@ namespace Chatr
         /// </summary>
         /// <param name="encryptedMessage">The encrypted message.</param>
         /// <returns>Decoded message.</returns>
-        public string Decode(byte[] encryptedMessage)
+        public byte[] Decode(byte[] encryptedMessage)
         {
-            string message = null;
+            byte[] message = null;
 
             using (var algorithm = SymmetricAlgorithm.Create(_algName))
             {
@@ -88,9 +88,9 @@ namespace Chatr
                 {
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        using (BinaryReader brDecrypt = new BinaryReader(csDecrypt))
                         {
-                            message = srDecrypt.ReadToEnd();
+                            message = brDecrypt.ReadBytes(cipherText.Length);
                         }
                     }
                 }
@@ -104,7 +104,7 @@ namespace Chatr
         /// </summary>
         /// <param name="message">The message.</param>
         /// <returns>Encrypted message.</returns>
-        public byte[] Encode(string message)
+        public byte[] Encode(byte[] message)
         {
             byte[] encryptedMessage;
 
@@ -119,9 +119,9 @@ namespace Chatr
                 {
                     using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                     {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        using (BinaryWriter bwEncrypt = new BinaryWriter(csEncrypt))
                         {
-                            swEncrypt.Write(message);
+                            bwEncrypt.Write(message);
                         }
 
                         encryptedMessage = algorithm.IV.Concat(msEncrypt.ToArray()).ToArray();

@@ -23,10 +23,10 @@ namespace Chatr
 {
     public class MessageReceivedEventArgs : EventArgs
     {
-        public string Message { get; set; }
+        public byte[] Message { get; set; }
         public IPAddress SenderIP { get; set; }
 
-        public MessageReceivedEventArgs(string message, IPAddress senderIP)
+        public MessageReceivedEventArgs(byte[] message, IPAddress senderIP)
         {
             Message = message;
             SenderIP = senderIP;

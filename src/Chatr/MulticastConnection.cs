@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Chatr
@@ -83,7 +84,7 @@ namespace Chatr
         /// <param name="checkActive">
         /// if set to <c>true</c> check to see if connection is active before sending.
         /// </param>
-        private void Send(string message, bool checkActive)
+        private void Send(byte[] message, bool checkActive)
         {
             if (!checkActive || Active)
             {
@@ -150,7 +151,7 @@ namespace Chatr
 
                             Array.Resize(ref datagram, length);
 
-                            string message = null;
+                            byte[] message = null;
                             try
                             {
                                 message = _messageTransform.Decode(datagram);
@@ -304,7 +305,7 @@ namespace Chatr
         /// Sends the specified message.
         /// </summary>
         /// <param name="message">The message.</param>
-        public void Send(string message)
+        public void Send(byte[] message)
         {
             Send(message, false);
         }

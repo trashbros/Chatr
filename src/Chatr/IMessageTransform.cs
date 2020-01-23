@@ -31,14 +31,14 @@ namespace Chatr
         /// </summary>
         /// <param name="encodedMessage">The encoded message.</param>
         /// <returns>Decoded message.</returns>
-        string Decode(byte[] encodedMessage);
+        byte[] Decode(byte[] encodedMessage);
 
         /// <summary>
         /// Encodes the specified message.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <returns>Encoded message.</returns>
-        byte[] Encode(string message);
+        byte[] Encode(byte[] message);
 
         #endregion Public Methods
     }

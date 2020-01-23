@@ -35,9 +35,9 @@ namespace Chatr
         /// </summary>
         /// <param name="encodedMessage">The Base64 encoded message.</param>
         /// <returns>Decoded message.</returns>
-        public string Decode(byte[] encodedMessage)
+        public byte[] Decode(byte[] encodedMessage)
         {
-            return Encoding.UTF8.GetString(Convert.FromBase64String(Encoding.UTF8.GetString(encodedMessage)));
+            return Convert.FromBase64String(Encoding.UTF8.GetString(encodedMessage));
         }
 
         /// <summary>
@@ -45,9 +45,9 @@ namespace Chatr
         /// </summary>
         /// <param name="message">The message.</param>
         /// <returns>Base64 encoded message.</returns>
-        public byte[] Encode(string message)
+        public byte[] Encode(byte[] message)
         {
-            return Encoding.UTF8.GetBytes(Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
+            return Encoding.UTF8.GetBytes(Convert.ToBase64String(message));
         }
 
         #endregion Public Methods

@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 
 namespace Chatr
 {
@@ -103,7 +104,7 @@ namespace Chatr
             else
             {
                 // Send The message
-                connection?.Send(channelSettings.DisplayName + ">" + message);
+                connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">" + message));
             }
         }
 
@@ -157,9 +158,11 @@ namespace Chatr
         /// <param name="m"></param>
         private void HandleMessagingCalls(MessageReceivedEventArgs m)
         {
+            string message = Encoding.UTF8.GetString(m.Message);
+
             // Parse out the sender name
-            string senderName = m.Message.Split('>')[0];
-            string text = m.Message.Substring(senderName.Length + 1);
+            string senderName = message.Split('>')[0];
+            string text = message.Substring(senderName.Length + 1);
 
             // Check to see if this is a command message
             if (text.StartsWith("/", StringComparison.Ordinal))
@@ -223,7 +226,7 @@ namespace Chatr
                     {
                         m_onlineUsers.Add(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"), SystemMessageColor);
-                        connection?.Send(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName);
+                        connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName));
                     }
                     break;
                 // Notified a user changed their display name
@@ -255,7 +258,7 @@ namespace Chatr
                 // Quit command
                 case CommandList.QUIT_S:
                 case CommandList.QUIT:
-                    connection?.Send(channelSettings.DisplayName + ">/" + CommandList.LOGOFF);
+                    connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.LOGOFF));
                     m_onlineUsers.Clear();
                     break;
                 // Active user list request
@@ -270,7 +273,7 @@ namespace Chatr
                 // Change your display name
                 case CommandList.CHANGE_NAME:
                     string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1);
-                    connection?.Send(channelSettings.DisplayName + ">/" + CommandList.NAME_CHANGED + " " + newName);
+                    connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.NAME_CHANGED + " " + newName));
                     channelSettings.DisplayName = newName;
                     break;
                 // Change your multicast ip address
@@ -302,7 +305,7 @@ namespace Chatr
                 // Not a valid command string
                 default:
                     // Send The message
-                    connection?.Send(channelSettings.DisplayName + ">/" + message);
+                    connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + message));
                     break;
             }
         }
