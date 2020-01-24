@@ -20,7 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Chatr
@@ -37,11 +36,6 @@ namespace Chatr
         /// The local IP address used for sending and receiving data.
         /// </summary>
         private readonly IPAddress _localIP;
-
-        /// <summary>
-        /// The message transform used when sending and receiving data.
-        /// </summary>
-        private readonly IMessageTransform _messageTransform;
 
         /// <summary>
         /// The multicast end point used for sending and receiving data.
@@ -88,8 +82,6 @@ namespace Chatr
         {
             if (!checkActive || Active)
             {
-                byte[] datagram = _messageTransform.Encode(message);
-
                 try
                 {
                     if (_sendClient == null)
@@ -97,7 +89,7 @@ namespace Chatr
                         _sendClient = new UdpClient(new IPEndPoint(_localIP, 0));
                     }
 
-                    _sendClient.Send(datagram, datagram.Length, _multicastEndPoint);
+                    _sendClient.Send(message, message.Length, _multicastEndPoint);
                 }
                 catch (SocketException)
                 {
@@ -149,21 +141,11 @@ namespace Chatr
                                 }
                             }
 
-                            Array.Resize(ref datagram, length);
+                            if (length > 0)
+                            {
+                                Array.Resize(ref datagram, length);
 
-                            byte[] message = null;
-                            try
-                            {
-                                message = _messageTransform.Decode(datagram);
-                            }
-                            catch (Exception)
-                            {
-                                // Exception trying to decode the message. Silently ignore it
-                            }
-
-                            if (message != null)
-                            {
-                                MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(message, remoteIPEndPoint.Address));
+                                MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(datagram, remoteIPEndPoint.Address));
                             }
                         }
 
@@ -218,14 +200,10 @@ namespace Chatr
         /// <param name="multicastEndPoint">
         /// The multicast end point to use for sending and receiving data.
         /// </param>
-        /// <param name="messageTransform">
-        /// The message transform to use when sending and receiving data.
-        /// </param>
-        public MulticastConnection(IPAddress localIP, IPEndPoint multicastEndPoint, IMessageTransform messageTransform)
+        public MulticastConnection(IPAddress localIP, IPEndPoint multicastEndPoint)
         {
             _localIP = localIP;
             _multicastEndPoint = multicastEndPoint;
-            _messageTransform = messageTransform;
         }
 
         #endregion Public Constructors
@@ -233,7 +211,7 @@ namespace Chatr
         #region Public Events
 
         /// <summary>
-        /// Occurs when a properly decoded message is received.
+        /// Occurs when a message is received.
         /// </summary>
         public event EventHandler<MessageReceivedEventArgs> MessageReceivedEventHandler;
 

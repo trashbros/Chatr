@@ -66,6 +66,11 @@ namespace Chatr
 
         private readonly List<string> m_onlineUsers;
 
+        /// <summary>
+        /// The message transform used when sending and receiving data.
+        /// </summary>
+        private IMessageTransform _messageTransform;
+
         #endregion Private Member Variables
 
         /// <summary>
@@ -104,7 +109,7 @@ namespace Chatr
             else
             {
                 // Send The message
-                connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">" + message));
+                connection?.Send(_messageTransform.Encode(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">" + message)));
             }
         }
 
@@ -125,10 +130,11 @@ namespace Chatr
         /// </summary>
         private void ConnectClient()
         {
-            var messageTransform = new PasswordEncryptedMessageTransform(channelSettings.Password, "AES");
+            // Create a new message transform
+            _messageTransform = new PasswordEncryptedMessageTransform(channelSettings.Password, "AES");
 
             // Create a new connection
-            connection = new MulticastConnection(IPAddress.Parse(channelSettings.ConnectionIP), new IPEndPoint(IPAddress.Parse(channelSettings.MulticastIP), channelSettings.Port), messageTransform);
+            connection = new MulticastConnection(IPAddress.Parse(channelSettings.ConnectionIP), new IPEndPoint(IPAddress.Parse(channelSettings.MulticastIP), channelSettings.Port));
 
             // Attach a message handler
             connection.MessageReceivedEventHandler += (sender, m) =>
@@ -158,23 +164,34 @@ namespace Chatr
         /// <param name="m"></param>
         private void HandleMessagingCalls(MessageReceivedEventArgs m)
         {
-            string message = Encoding.UTF8.GetString(m.Message);
-
-            // Parse out the sender name
-            string senderName = message.Split('>')[0];
-            string text = message.Substring(senderName.Length + 1);
-
-            // Check to see if this is a command message
-            if (text.StartsWith("/", StringComparison.Ordinal))
+            string message = null;
+            try
             {
-                // Trim off the starting slash then try to parse the command
-                text = text.TrimStart('/');
-                HandleIncomingCommandText(text, senderName);
+                message = Encoding.UTF8.GetString(_messageTransform.Decode(m.Message));
             }
-            else
+            catch (Exception)
             {
-                // Display the message
-                DisplayMessage(FormatMessageText($"{ senderName }: { text }", (senderName != channelSettings.DisplayName)), BaseColor);
+                // Silently ignore invalid message
+            }
+
+            if (message != null)
+            {
+                // Parse out the sender name
+                string senderName = message.Split('>')[0];
+                string text = message.Substring(senderName.Length + 1);
+
+                // Check to see if this is a command message
+                if (text.StartsWith("/", StringComparison.Ordinal))
+                {
+                    // Trim off the starting slash then try to parse the command
+                    text = text.TrimStart('/');
+                    HandleIncomingCommandText(text, senderName);
+                }
+                else
+                {
+                    // Display the message
+                    DisplayMessage(FormatMessageText($"{ senderName }: { text }", (senderName != channelSettings.DisplayName)), BaseColor);
+                }
             }
         }
 
@@ -226,7 +243,7 @@ namespace Chatr
                     {
                         m_onlineUsers.Add(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"), SystemMessageColor);
-                        connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName));
+                        connection?.Send(_messageTransform.Encode(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.USER_PING + " " + senderName)));
                     }
                     break;
                 // Notified a user changed their display name
@@ -258,7 +275,7 @@ namespace Chatr
                 // Quit command
                 case CommandList.QUIT_S:
                 case CommandList.QUIT:
-                    connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.LOGOFF));
+                    connection?.Send(_messageTransform.Encode(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.LOGOFF)));
                     m_onlineUsers.Clear();
                     break;
                 // Active user list request
@@ -273,7 +290,7 @@ namespace Chatr
                 // Change your display name
                 case CommandList.CHANGE_NAME:
                     string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1);
-                    connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.NAME_CHANGED + " " + newName));
+                    connection?.Send(_messageTransform.Encode(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + CommandList.NAME_CHANGED + " " + newName)));
                     channelSettings.DisplayName = newName;
                     break;
                 // Change your multicast ip address
@@ -305,7 +322,7 @@ namespace Chatr
                 // Not a valid command string
                 default:
                     // Send The message
-                    connection?.Send(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + message));
+                    connection?.Send(_messageTransform.Encode(Encoding.UTF8.GetBytes(channelSettings.DisplayName + ">/" + message)));
                     break;
             }
         }
