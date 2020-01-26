@@ -266,12 +266,6 @@ namespace Chatr
             string command = message.Split(' ')[0];
             switch (command.ToLower())
             {
-                // Quit command
-                case CommandList.QUIT_S:
-                case CommandList.QUIT:
-                    Send(BuildLogOffMessage());
-                    _onlineUsers.Clear();
-                    break;
                 // Active user list request
                 case CommandList.USER_LIST:
                     string userText = "Active users are:\n";
@@ -463,7 +457,10 @@ namespace Chatr
         /// </summary>
         public void Disconnect()
         {
-            SendMessage("/" + CommandList.QUIT);
+            Send(BuildLogOffMessage());
+
+            _onlineUsers.Clear();
+
             _connection?.Close();
             _connection?.Dispose();
             _connection = null;
