@@ -119,6 +119,7 @@ namespace Chatr
         public void ShutDown()
         {
             this.SendMessage("/" + CommandList.QUIT);
+            connection?.Close();
             connection?.Dispose();
             connection = null;
         }
@@ -142,8 +143,8 @@ namespace Chatr
                 HandleMessagingCalls(m);
             };
 
-            // Connect
-            connection.Connect();
+            // Open the connection
+            connection.Open();
 
             // Wait for the connection to become active
             while (!connection.Active)

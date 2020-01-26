@@ -180,7 +180,7 @@ namespace Chatr
             {
                 if (disposing)
                 {
-                    Disconnect();
+                    Close();
 
                     _sendClient.Close();
                 }
@@ -248,19 +248,9 @@ namespace Chatr
         #region Public Methods
 
         /// <summary>
-        /// Connect to the multicast end point.
+        /// Close the connection to the multicast end point.
         /// </summary>
-        public void Connect()
-        {
-            Disconnect();
-
-            _recvTask = StartReceiving();
-        }
-
-        /// <summary>
-        /// Disconnect from the multicast end point.
-        /// </summary>
-        public void Disconnect()
+        public void Close()
         {
             if (_recvTask != null)
             {
@@ -277,6 +267,16 @@ namespace Chatr
         public void Dispose()
         {
             Dispose(true);
+        }
+
+        /// <summary>
+        /// Open the connection to the multicast end point.
+        /// </summary>
+        public void Open()
+        {
+            Close();
+
+            _recvTask = StartReceiving();
         }
 
         /// <summary>
