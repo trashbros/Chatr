@@ -165,7 +165,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     if (!channel.IsConnected)
                     {
                         DisplayMessage($"Connecting to {channel.ChannelName}...\n", globalSettings.SystemMessageColor);
-                        channel.Init();
+                        channel.Connect();
                         channelfound = true;
                     }
                 }
@@ -179,7 +179,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     if (!channelList[chan].IsConnected)
                     {
                         DisplayMessage($"Connecting to {channelList[chan].ChannelName}...\n", globalSettings.SystemMessageColor);
-                        channelList[chan].Init();
+                        channelList[chan].Connect();
                         channelfound = true;
                     }
                 }
@@ -202,7 +202,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 for (int i = 1; i < cnames.Length; i++)
                 {
                     var chan = channelList.FindIndex(c => c.ChannelName == cnames[i]);
-                    channelList[chan].ShutDown();
+                    channelList[chan].Disconnect();
                     // TODO: Handle closing channel and switching to others if availabel
                 }
             }
@@ -212,7 +212,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
         {
             foreach (var channel in channelList)
             {
-                channel.ShutDown();
+                channel.Disconnect();
             }
         }
 
@@ -227,7 +227,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
             // TODO: Add silent option to limit logging of channel connection stuff
             channelList.Add(new Channel(channelSettings));
             channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
-            channelList[channelList.Count - 1].Init();
+            channelList[channelList.Count - 1].Connect();
         }
 
         /* TODO: Implement DeleteChannel
