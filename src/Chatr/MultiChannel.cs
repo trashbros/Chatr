@@ -131,6 +131,25 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     }
                     break;
 
+                // Active user list request
+                case CommandList.USER_LIST:
+                    if (activeChannelIndex > -1)
+                    {
+                        string userText = "Active users are:\n";
+
+                        foreach (var user in channelList[activeChannelIndex].Users)
+                        {
+                            userText += user + "\n";
+                        }
+
+                        DisplayMessage(userText, globalSettings.SystemMessageColor);
+                    }
+                    else
+                    {
+                        DisplayMessage("Can't display active users: No active channel.\n", globalSettings.SystemMessageColor);
+                    }
+                    break;
+
                 // Add a channel
                 case CommandList.ADD_CHANNEL:
                     AddNewChannel(message);

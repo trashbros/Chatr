@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -29,14 +30,14 @@ namespace Chatr
         #region Private Fields
 
         /// <summary>
-        /// Collection of online users present in this channel.
-        /// </summary>
-        private readonly HashSet<string> _onlineUsers;
-
-        /// <summary>
         /// <para>The settings for this channel.</para>
         /// </summary>
         private readonly ChannelSettings _settings;
+
+        /// <summary>
+        /// Collection of online users present in this channel.
+        /// </summary>
+        private readonly HashSet<string> _users;
 
         /// <summary>
         /// The connection used to send and receive messages.
@@ -117,7 +118,7 @@ namespace Chatr
             }
 
             // Add self as an online user
-            _onlineUsers.Add(_settings.DisplayName);
+            _users.Add(_settings.DisplayName);
 
             // Send the log on command
             Send(BuildLogOnMessage());
@@ -184,14 +185,14 @@ namespace Chatr
                     text = message.Substring(CommandList.USER_PING.Length + 1).Trim();
                     if (text.StartsWith(_settings.DisplayName, StringComparison.Ordinal))
                     {
-                        _onlineUsers.Add(senderName);
+                        _users.Add(senderName);
                     }
                     break;
                 // User logged off
                 case CommandList.LOGOFF:
                     if (string.Compare(senderName, _settings.DisplayName, StringComparison.Ordinal) != 0)
                     {
-                        _onlineUsers.Remove(senderName);
+                        _users.Remove(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged off!]"), SystemMessageColor);
                     }
                     break;
@@ -199,7 +200,7 @@ namespace Chatr
                 case CommandList.LOGON:
                     if (string.Compare(senderName, _settings.DisplayName, StringComparison.Ordinal) != 0)
                     {
-                        _onlineUsers.Add(senderName);
+                        _users.Add(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"), SystemMessageColor);
                     }
                     break;
@@ -208,8 +209,8 @@ namespace Chatr
                     string newName = message.Substring(CommandList.NAME_CHANGED.Length + 1).Trim();
                     if (string.Compare(senderName, _settings.DisplayName, StringComparison.Ordinal) != 0 && string.Compare(newName, _settings.DisplayName, StringComparison.Ordinal) != 0)
                     {
-                        _onlineUsers.Remove(senderName);
-                        _onlineUsers.Add(newName);
+                        _users.Remove(senderName);
+                        _users.Add(newName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has changed to {newName}]"), SystemMessageColor);
                     }
                     break;
@@ -266,15 +267,6 @@ namespace Chatr
             string command = message.Split(' ')[0];
             switch (command.ToLower())
             {
-                // Active user list request
-                case CommandList.USER_LIST:
-                    string userText = "Active users are:\n";
-                    foreach (var user in _onlineUsers)
-                    {
-                        userText += user + "\n";
-                    }
-                    DisplayMessage(userText, SystemMessageColor);
-                    break;
                 // Change your multicast ip address
                 case CommandList.CHANGE_MULTICAST:
                     var newIP = message.Substring(CommandList.CHANGE_MULTICAST.Length + 1);
@@ -355,7 +347,7 @@ namespace Chatr
         public Channel(ChannelSettings settings)
         {
             _settings = settings;
-            _onlineUsers = new HashSet<string>();
+            _users = new HashSet<string>();
         }
 
         #endregion Public Constructors
@@ -434,6 +426,12 @@ namespace Chatr
         /// <value>The color used for system messages.</value>
         public string SystemMessageColor { get { return _settings.SystemMessageColor; } }
 
+        /// <summary>
+        /// Gets the list of users active on the channel.
+        /// </summary>
+        /// <value>The active users on the channel.</value>
+        public IList<string> Users { get => _users.ToList().AsReadOnly(); }
+
         #endregion Public Properties
 
         #region Public Methods
@@ -453,7 +451,7 @@ namespace Chatr
         {
             Send(BuildLogOffMessage());
 
-            _onlineUsers.Clear();
+            _users.Clear();
 
             _connection?.Close();
             _connection?.Dispose();
@@ -487,8 +485,8 @@ namespace Chatr
         {
             Send(BuildRenameMessage(newName));
 
-            _onlineUsers.Remove(_settings.DisplayName);
-            _onlineUsers.Add(newName);
+            _users.Remove(_settings.DisplayName);
+            _users.Add(newName);
 
             _settings.DisplayName = newName;
         }
@@ -505,7 +503,7 @@ namespace Chatr
             channelDetails += $"Port: {_settings.PortString}\nPassword: {_settings.Password}\n\n";
 
             string userText = "Active users are:\n";
-            foreach (var user in _onlineUsers)
+            foreach (var user in _users)
             {
                 userText += user + "\n";
             }
