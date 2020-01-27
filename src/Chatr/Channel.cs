@@ -112,7 +112,7 @@ namespace Chatr
             // Attach a message handler
             _connection.MessageReceivedEventHandler += (sender, m) =>
             {
-                HandleMessagingCalls(m);
+                OnMessageReceived(m);
             };
 
             // Open the connection
@@ -162,12 +162,25 @@ namespace Chatr
         }
 
         /// <summary>
-        /// Parses command text of incoming messages to properly format and respond
+        /// Parses and handles a message.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="senderName"></param>
-        private void HandleIncomingCommandText(string message, string senderName)
+        /// <param name="message">The message.</param>
+        private void HandleMessage(string message)
         {
+            string senderName = message.Split('>')[0];
+            message = message.Substring(senderName.Length + 1);
+
+            // If this isn't a command message
+            if (!message.StartsWith("/", StringComparison.Ordinal))
+            {
+                // Display the message
+                DisplayMessage(FormatMessageText($"{ senderName }: { message }", (senderName != _settings.DisplayName)), BaseColor);
+                return;
+            }
+
+            // Trim off the starting slash then try to parse the command
+            message = message.TrimStart('/');
+
             string command = message.Split(' ')[0];
             switch (command.ToLower())
             {
@@ -229,43 +242,6 @@ namespace Chatr
         }
 
         /// <summary>
-        /// Our incoming message handling class the recieves messages from the multicast connection
-        /// </summary>
-        /// <param name="m"></param>
-        private void HandleMessagingCalls(MessageReceivedEventArgs m)
-        {
-            string message = null;
-            try
-            {
-                message = Encoding.UTF8.GetString(_messageTransform.Decode(m.Message));
-            }
-            catch (Exception)
-            {
-                // Silently ignore invalid message
-            }
-
-            if (message != null)
-            {
-                // Parse out the sender name
-                string senderName = message.Split('>')[0];
-                string text = message.Substring(senderName.Length + 1);
-
-                // Check to see if this is a command message
-                if (text.StartsWith("/", StringComparison.Ordinal))
-                {
-                    // Trim off the starting slash then try to parse the command
-                    text = text.TrimStart('/');
-                    HandleIncomingCommandText(text, senderName);
-                }
-                else
-                {
-                    // Display the message
-                    DisplayMessage(FormatMessageText($"{ senderName }: { text }", (senderName != _settings.DisplayName)), BaseColor);
-                }
-            }
-        }
-
-        /// <summary>
         /// Disconnect any existing connection and create a new connection
         /// </summary>
         private void NewConnection()
@@ -276,7 +252,24 @@ namespace Chatr
             }
 
             ConnectClient();
+        }
 
+        /// <summary>
+        /// Our incoming message handling class the recieves messages from the multicast connection
+        /// </summary>
+        /// <param name="m"></param>
+        private void OnMessageReceived(MessageReceivedEventArgs m)
+        {
+            try
+            {
+                string message = Encoding.UTF8.GetString(_messageTransform.Decode(m.Message));
+
+                HandleMessage(message);
+            }
+            catch (Exception)
+            {
+                // Silently ignore invalid message
+            }
         }
 
         /// <summary>
