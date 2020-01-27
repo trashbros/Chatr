@@ -275,12 +275,6 @@ namespace Chatr
                     }
                     DisplayMessage(userText, SystemMessageColor);
                     break;
-                // Change your display name
-                case CommandList.CHANGE_NAME:
-                    string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1);
-                    Send(BuildRenameMessage(newName));
-                    _settings.DisplayName = newName;
-                    break;
                 // Change your multicast ip address
                 case CommandList.CHANGE_MULTICAST:
                     var newIP = message.Substring(CommandList.CHANGE_MULTICAST.Length + 1);
@@ -483,6 +477,20 @@ namespace Chatr
                 // Send The message as a text message
                 Send(BuildTextMessage(message));
             }
+        }
+
+        /// <summary>
+        /// Sets the display name.
+        /// </summary>
+        /// <param name="newName">The new name.</param>
+        public void SetDisplayName(string newName)
+        {
+            Send(BuildRenameMessage(newName));
+
+            _onlineUsers.Remove(_settings.DisplayName);
+            _onlineUsers.Add(newName);
+
+            _settings.DisplayName = newName;
         }
 
         /// <summary>

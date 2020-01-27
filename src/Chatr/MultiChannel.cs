@@ -115,18 +115,22 @@ The source code can be found at https://github.com/trashbros/Chatr/
                         DisplayMessage($"No channel with name {channelname} could be found.\n", globalSettings.SystemMessageColor);
                     }
                     break;
-                // Change global username
+
+                // Change user name
                 case CommandList.CHANGE_NAME:
-                    var text = message.Substring(CommandList.CHANGE_NAME.Length + 1);
-                    if (text.Contains(" -g "))
+                    if (activeChannelIndex > -1)
                     {
-                        // TODO: Add global username change in here
+                        string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1).Trim();
+
+                        channelList[activeChannelIndex].SetDisplayName(newName);
+                        DisplayMessage($"Display name set to {newName}.\n", globalSettings.SystemMessageColor);
                     }
                     else
                     {
-                        PassMessage($"/" + message);
+                        DisplayMessage("Can't set display name: No active channel.\n", globalSettings.SystemMessageColor);
                     }
                     break;
+
                 // Add a channel
                 case CommandList.ADD_CHANNEL:
                     AddNewChannel(message);
