@@ -44,8 +44,8 @@ namespace Chatr
             }
             else
             {
-                // Send The message
-                PassMessage(message);
+                // Send a text message
+                TextMessage(message);
             }
         }
 
@@ -192,6 +192,13 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     }
                     break;
 
+                // Send a private message
+                case CommandList.PM:
+                    string targetUser = message.Split(' ')[1];
+                    string text = message.Substring(message.IndexOf(targetUser) + targetUser.Length);
+                    PrivateMessage(targetUser, text);
+                    break;
+
                 // Add a channel
                 case CommandList.ADD_CHANNEL:
                     AddNewChannel(message);
@@ -213,8 +220,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     break;
                 // Not a valid command string
                 default:
-                    // Send The message
-                    PassMessage($"/" + message);
+                    DisplayMessage("Invalid command string!\n", globalSettings.SystemMessageColor);
                     break;
             }
         }
@@ -526,14 +532,30 @@ The source code can be found at https://github.com/trashbros/Chatr/
             file.Close();
         }
 
-        /// <summary>  This is a passthrough function to pass</summary>
+        /// <summary>Send a text message to all users in the channel.</summary>
         /// <param name="message">The message.</param>
-        private void PassMessage(string message)
+        private void TextMessage(string message)
         {
             // Send The message
             if (activeChannelIndex > -1 && channelList[activeChannelIndex].IsConnected)
             {
-                channelList[activeChannelIndex]?.SendMessage(message);
+                channelList[activeChannelIndex]?.SendTextMessageToAll(message);
+            }
+            else
+            {
+                DisplayMessage("No channel selected for sending\n", globalSettings.SystemMessageColor);
+            }
+        }
+
+        /// <summary>Send a private text message to a user in the channel.</summary>
+        /// <param name="user"">The target user.</param>
+        /// <param name="message">The message.</param>
+        private void PrivateMessage(string user, string message)
+        {
+            // Send The message
+            if (activeChannelIndex > -1 && channelList[activeChannelIndex].IsConnected)
+            {
+                channelList[activeChannelIndex]?.SendTextMessageToOne(user, message);
             }
             else
             {

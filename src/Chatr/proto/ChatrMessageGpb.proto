@@ -31,8 +31,8 @@ message ChatrMessage {
 	}
 
     uint32 protocol_version = 1;
-	string source           = 2;
-	string destination      = 3;
+	string sender           = 2;
+	string target           = 3;
 
     oneof sub_message {
         TextMessage   text_message    = 4;

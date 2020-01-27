@@ -86,9 +86,16 @@ namespace Chatr
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The message.</returns>
-        private byte[] BuildTextMessage(string text)
+        private byte[] BuildTextMessage(string target, string text)
         {
-            return Encoding.UTF8.GetBytes(_settings.DisplayName + ">" + text);
+            if (target == "*")
+            {
+                return Encoding.UTF8.GetBytes(_settings.DisplayName + ">" + text);
+            }
+            else
+            {
+                return Encoding.UTF8.GetBytes(_settings.DisplayName + $">/pm {target} " + text);
+            }
         }
 
         /// <summary>
@@ -259,23 +266,6 @@ namespace Chatr
         }
 
         /// <summary>
-        /// Parse and handle commands on the outgoing side that would react back to the user.
-        /// </summary>
-        /// <param name="message"></param>
-        private void HandleOutgoingCommandText(string message)
-        {
-            string command = message.Split(' ')[0];
-            switch (command.ToLower())
-            {
-                // Not a valid command string
-                default:
-                    // Send The message
-                    Send(BuildTextMessage("/" + message));
-                    break;
-            }
-        }
-
-        /// <summary>
         /// Disconnect any existing connection and create a new connection
         /// </summary>
         private void NewConnection()
@@ -433,22 +423,22 @@ namespace Chatr
         }
 
         /// <summary>
-        /// Send a message out. All parsing on the outgoing side goes here.
+        /// Sends a text message to all users on the channel.
         /// </summary>
-        /// <param name="message"></param>
-        public void SendMessage(string message)
+        /// <param name="text"></param>
+        public void SendTextMessageToAll(string text)
         {
-            // Check to see if this is a command message
-            if (message.StartsWith("/", StringComparison.Ordinal))
-            {
-                message = message.TrimStart('/');
-                HandleOutgoingCommandText(message);
-            }
-            else
-            {
-                // Send The message as a text message
-                Send(BuildTextMessage(message));
-            }
+            Send(BuildTextMessage("*", text));
+        }
+
+        /// <summary>
+        /// Sends a text message to a specific user on the channel.
+        /// </summary>
+        /// <param name="target">The target user.</param>
+        /// <param name="text">The text to send.</param>
+        public void SendTextMessageToOne(string target, string text)
+        {
+            Send(BuildTextMessage(target, text));
         }
 
         /// <summary>
