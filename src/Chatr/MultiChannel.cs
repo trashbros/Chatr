@@ -171,6 +171,27 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     }
                     break;
 
+                // Change your multicast ip address
+                case CommandList.CHANGE_MULTICAST:
+                    if (activeChannelIndex > -1)
+                    {
+                        var newIP = message.Substring(CommandList.CHANGE_MULTICAST.Length + 1);
+
+                        if (!Helpers.IsValidMulticastIP(newIP))
+                        {
+                            DisplayMessage($"Can't set multicast IP to {newIP}: Multicast IP is not valid\n", globalSettings.SystemMessageColor);
+                        }
+                        else
+                        {
+                            channelList[activeChannelIndex].SetMulticastIP(newIP);
+                        }
+                    }
+                    else
+                    {
+                        DisplayMessage("Can't set multicast IP: No active channel.\n", globalSettings.SystemMessageColor);
+                    }
+                    break;
+
                 // Add a channel
                 case CommandList.ADD_CHANNEL:
                     AddNewChannel(message);

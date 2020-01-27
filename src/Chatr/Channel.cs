@@ -267,19 +267,6 @@ namespace Chatr
             string command = message.Split(' ')[0];
             switch (command.ToLower())
             {
-                // Change your multicast ip address
-                case CommandList.CHANGE_MULTICAST:
-                    var newIP = message.Substring(CommandList.CHANGE_MULTICAST.Length + 1);
-                    if (!Helpers.IsValidMulticastIP(newIP))
-                    {
-                        DisplayMessage("Multicast IP is not valid\n", SystemMessageColor);
-                    }
-                    else
-                    {
-                        _settings.MulticastIP = newIP;
-                        NewConnection();
-                    }
-                    break;
                 // Not a valid command string
                 default:
                     // Send The message
@@ -476,6 +463,17 @@ namespace Chatr
             _users.Add(newName);
 
             _settings.DisplayName = newName;
+        }
+
+        /// <summary>
+        /// Sets the multicast IP address.
+        /// </summary>
+        /// <param name="ipString">The IP string.</param>
+        public void SetMulticastIP(string ipString)
+        {
+            _settings.MulticastIP = ipString;
+
+            NewConnection();
         }
 
         /// <summary>
