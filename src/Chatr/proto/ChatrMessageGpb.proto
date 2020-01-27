@@ -4,42 +4,43 @@ package Chatr;
 
 message ChatrMessage {
     message TextMessage {
-        string text = 1;
+        string target = 1;
+        string text   = 2;
     }
 
     message LogOnMessage {
-	}
+    }
 
     message LogOffMessage {
-	}
+    }
 
     message AwayMessage {
         string text = 1;
     }
 
     message EchoMessage {
+        string target = 1;
+
         enum EchoType {
             UNKNOWN  = 0;
             REQUEST  = 1;
             RESPONSE = 2;
-		}
-        EchoType type = 1;
-	}
+        }
+        EchoType echo_type = 2;
+    }
 
     message RenameMessage {
         string name = 1;
-	}
+    }
 
-    uint32 protocol_version = 1;
-	string sender           = 2;
-	string target           = 3;
+    string sender = 1;
 
     oneof sub_message {
-        TextMessage   text_message    = 4;
-        LogOnMessage  log_on_message  = 5; 
-        LogOffMessage log_off_message = 6; 
-        AwayMessage   away_message    = 7;
-        EchoMessage   echo_message    = 8;
-        RenameMessage rename_message  = 9;
+        TextMessage   text_message    = 2;
+        LogOnMessage  log_on_message  = 3;
+        LogOffMessage log_off_message = 4;
+        AwayMessage   away_message    = 5;
+        EchoMessage   echo_message    = 6;
+        RenameMessage rename_message  = 7;
     }
 }
