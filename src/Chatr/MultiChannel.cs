@@ -150,6 +150,27 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     }
                     break;
 
+                // Change your connection port
+                case CommandList.CHANGE_PORT:
+                    if (activeChannelIndex > -1)
+                    {
+                        var portString = message.Substring(CommandList.CHANGE_PORT.Length + 1);
+
+                        if (Helpers.TryParsePort(portString, out int port))
+                        {
+                            channelList[activeChannelIndex].SetPort(port);
+                        }
+                        else
+                        {
+                            DisplayMessage($"Can't set port to {portString}: Invalid port number provided!\n", globalSettings.SystemMessageColor);
+                        }
+                    }
+                    else
+                    {
+                        DisplayMessage("Can't set port: No active channel.\n", globalSettings.SystemMessageColor);
+                    }
+                    break;
+
                 // Add a channel
                 case CommandList.ADD_CHANNEL:
                     AddNewChannel(message);

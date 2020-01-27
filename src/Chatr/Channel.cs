@@ -277,20 +277,7 @@ namespace Chatr
                     else
                     {
                         _settings.MulticastIP = newIP;
-                        NewClientConnection();
-                    }
-                    break;
-                // Change your connection port
-                case CommandList.CHANGE_PORT:
-                    var portString = message.Substring(CommandList.CHANGE_PORT.Length + 1);
-                    _settings.PortString = portString;
-                    if (_settings.PortString != portString)
-                    {
-                        DisplayMessage("Invalid port number provided!\n", SystemMessageColor);
-                    }
-                    else
-                    {
-                        NewClientConnection();
+                        NewConnection();
                     }
                     break;
                 // Not a valid command string
@@ -304,7 +291,7 @@ namespace Chatr
         /// <summary>
         /// Disconnect any existing connection and create a new connection
         /// </summary>
-        private void NewClientConnection()
+        private void NewConnection()
         {
             // Check that our local IP is good
             if (!Helpers.IsValidIP(_settings.ConnectionIP))
@@ -441,7 +428,7 @@ namespace Chatr
         /// </summary>
         public void Connect()
         {
-            NewClientConnection();
+            NewConnection();
         }
 
         /// <summary>
@@ -489,6 +476,17 @@ namespace Chatr
             _users.Add(newName);
 
             _settings.DisplayName = newName;
+        }
+
+        /// <summary>
+        /// Sets the port number to the specified value.
+        /// </summary>
+        /// <param name="port">The port number.</param>
+        public void SetPort(int port)
+        {
+            _settings.Port = port;
+
+            NewConnection();
         }
 
         /// <summary>
