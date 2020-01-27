@@ -158,7 +158,9 @@ The source code can be found at https://github.com/trashbros/Chatr/
 
                         if (Helpers.TryParsePort(portString, out int port))
                         {
+                            DisplayMessage("Setting channel port...\n", globalSettings.SystemMessageColor);
                             channelList[activeChannelIndex].SetPort(port);
+                            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[activeChannelIndex].MulticastIP}\nPort: {channelList[activeChannelIndex].Port.ToString()}\n**************\n", globalSettings.SystemMessageColor);
                         }
                         else
                         {
@@ -183,7 +185,9 @@ The source code can be found at https://github.com/trashbros/Chatr/
                         }
                         else
                         {
+                            DisplayMessage("Setting multicast IP...\n", globalSettings.SystemMessageColor);
                             channelList[activeChannelIndex].SetMulticastIP(newIP);
+                            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[activeChannelIndex].MulticastIP}\nPort: {channelList[activeChannelIndex].Port.ToString()}\n**************\n", globalSettings.SystemMessageColor);
                         }
                     }
                     else
@@ -237,6 +241,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     {
                         DisplayMessage($"Connecting to {channel.ChannelName}...\n", globalSettings.SystemMessageColor);
                         channel.Connect();
+                        DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channel.MulticastIP}\nPort: {channel.Port.ToString()}\n**************\n", globalSettings.SystemMessageColor);
                         channelfound = true;
                     }
                 }
@@ -251,6 +256,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     {
                         DisplayMessage($"Connecting to {channelList[chan].ChannelName}...\n", globalSettings.SystemMessageColor);
                         channelList[chan].Connect();
+                        DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[chan].MulticastIP}\nPort: {channelList[chan].Port.ToString()}\n**************\n", globalSettings.SystemMessageColor);
                         channelfound = true;
                     }
                 }

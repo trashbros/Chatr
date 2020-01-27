@@ -270,25 +270,13 @@ namespace Chatr
         /// </summary>
         private void NewConnection()
         {
-            // Check that our local IP is good
-            if (!Helpers.IsValidIP(_settings.ConnectionIP))
-            {
-                DisplayMessage("Invalid client IP provided!\n", SystemMessageColor);
-                return;
-            }
-            // Check that our multicast IP is good
-            if (!Helpers.IsValidMulticastIP(_settings.MulticastIP))
-            {
-                DisplayMessage("Invalid multicast IP provided!\n", SystemMessageColor);
-                return;
-            }
-
             if (_connection != null)
             {
                 Disconnect();
             }
+
             ConnectClient();
-            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {_settings.MulticastIP}\nPort: {_settings.Port.ToString()}\n**************\n", SystemMessageColor);
+
         }
 
         /// <summary>
