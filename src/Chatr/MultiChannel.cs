@@ -123,7 +123,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                         string newName = message.Substring(CommandList.CHANGE_NAME.Length + 1).Trim();
 
                         channelList[activeChannelIndex].SetDisplayName(newName);
-                        DisplayMessage($"Display name set to {newName}.\n", globalSettings.SystemMessageColor);
+                        DisplayMessage($"Display name set to {newName}.\n", channelList[activeChannelIndex].SystemMessageColor);
                     }
                     else
                     {
@@ -142,7 +142,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                             userText += user + "\n";
                         }
 
-                        DisplayMessage(userText, globalSettings.SystemMessageColor);
+                        DisplayMessage(userText, channelList[activeChannelIndex].SystemMessageColor);
                     }
                     else
                     {
@@ -158,13 +158,13 @@ The source code can be found at https://github.com/trashbros/Chatr/
 
                         if (Helpers.TryParsePort(portString, out int port))
                         {
-                            DisplayMessage("Setting channel port...\n", globalSettings.SystemMessageColor);
+                            DisplayMessage("Setting channel port...\n", channelList[activeChannelIndex].SystemMessageColor);
                             channelList[activeChannelIndex].SetPort(port);
-                            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[activeChannelIndex].MulticastIP}\nPort: {channelList[activeChannelIndex].Port.ToString()}\n**************\n", globalSettings.SystemMessageColor);
+                            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[activeChannelIndex].MulticastIP}\nPort: {channelList[activeChannelIndex].Port.ToString()}\n**************\n", channelList[activeChannelIndex].SystemMessageColor);
                         }
                         else
                         {
-                            DisplayMessage($"Can't set port to {portString}: Invalid port number provided!\n", globalSettings.SystemMessageColor);
+                            DisplayMessage($"Can't set port to {portString}: Invalid port number provided!\n", channelList[activeChannelIndex].SystemMessageColor);
                         }
                     }
                     else
@@ -181,13 +181,13 @@ The source code can be found at https://github.com/trashbros/Chatr/
 
                         if (!Helpers.IsValidMulticastIP(newIP))
                         {
-                            DisplayMessage($"Can't set multicast IP to {newIP}: Multicast IP is not valid\n", globalSettings.SystemMessageColor);
+                            DisplayMessage($"Can't set multicast IP to {newIP}: Multicast IP is not valid\n", channelList[activeChannelIndex].SystemMessageColor);
                         }
                         else
                         {
-                            DisplayMessage("Setting multicast IP...\n", globalSettings.SystemMessageColor);
+                            DisplayMessage("Setting multicast IP...\n", channelList[activeChannelIndex].SystemMessageColor);
                             channelList[activeChannelIndex].SetMulticastIP(newIP);
-                            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[activeChannelIndex].MulticastIP}\nPort: {channelList[activeChannelIndex].Port.ToString()}\n**************\n", globalSettings.SystemMessageColor);
+                            DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[activeChannelIndex].MulticastIP}\nPort: {channelList[activeChannelIndex].Port.ToString()}\n**************\n", channelList[activeChannelIndex].SystemMessageColor);
                         }
                     }
                     else
@@ -207,24 +207,30 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 case CommandList.ADD_CHANNEL:
                     AddNewChannel(message);
                     break;
+
                 // Edit a channel
                 case CommandList.EDIT_CHANNEL:
+                    // TODO: Add channel editing
                     break;
+
                 // Get a listing of connected channels
                 case CommandList.CHANNEL_LIST:
                     PrintChannelList(message);
                     break;
+
                 // Get info on a specific channel
                 case CommandList.CHANNEL_INFO:
                     PrintChannelInfo(message);
                     break;
+
                 // Connect to a channel
                 case CommandList.CONNECT:
                     ConnectChannels(message);
                     break;
+
                 // Not a valid command string
                 default:
-                    DisplayMessage("Invalid command string!\n", globalSettings.SystemMessageColor);
+                    DisplayMessage("Invalid command!\n", globalSettings.SystemMessageColor);
                     break;
             }
         }
@@ -241,7 +247,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     {
                         DisplayMessage($"Connecting to {channel.ChannelName}...\n", globalSettings.SystemMessageColor);
                         channel.Connect();
-                        DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channel.MulticastIP}\nPort: {channel.Port.ToString()}\n**************\n", globalSettings.SystemMessageColor);
+                        DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channel.MulticastIP}\nPort: {channel.Port.ToString()}\n**************\n", channel.SystemMessageColor);
                         channelfound = true;
                     }
                 }
@@ -256,7 +262,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                     {
                         DisplayMessage($"Connecting to {channelList[chan].ChannelName}...\n", globalSettings.SystemMessageColor);
                         channelList[chan].Connect();
-                        DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[chan].MulticastIP}\nPort: {channelList[chan].Port.ToString()}\n**************\n", globalSettings.SystemMessageColor);
+                        DisplayMessage($"**************\nJoined Multicast Group:\nIP: {channelList[chan].MulticastIP}\nPort: {channelList[chan].Port.ToString()}\n**************\n", channelList[chan].SystemMessageColor);
                         channelfound = true;
                     }
                 }
@@ -280,6 +286,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 {
                     var chan = channelList.FindIndex(c => c.ChannelName == cnames[i]);
                     channelList[chan].Disconnect();
+
                     // TODO: Handle closing channel and switching to others if availabel
                 }
             }
@@ -302,6 +309,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
         private void AddNewChannel(ChannelSettings channelSettings, bool _ /* silent = true */)
         {
             // TODO: Add silent option to limit logging of channel connection stuff
+
             channelList.Add(new Channel(channelSettings));
             channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
             channelList[channelList.Count - 1].Connect();
@@ -333,8 +341,8 @@ The source code can be found at https://github.com/trashbros/Chatr/
             string channelName = message.Substring(CommandList.CHANNEL_INFO.Length + 1);
             try
             {
-                var channelInfo = channelList.Find(channel => channel.ChannelName == channelName);
-                DisplayMessage(channelInfo.ToString(), globalSettings.SystemMessageColor);
+                var channel = channelList.Find(chan => chan.ChannelName == channelName);
+                DisplayMessage(channel.ToString(), channel.SystemMessageColor);
             }
             catch
             {
