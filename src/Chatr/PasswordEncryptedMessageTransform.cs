@@ -28,7 +28,7 @@ namespace Chatr
     /// Encode/Decode password encrypted messages.
     /// </summary>
     /// <seealso cref="Chatr.IMessageTransform"/>
-    internal class PasswordEncryptedMessageTransform : IMessageTransform
+    public class PasswordEncryptedMessageTransform : IMessageTransform
     {
         #region Private Fields
 

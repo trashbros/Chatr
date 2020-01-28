@@ -7,20 +7,26 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatrConsole", "ChatrConsol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chatr", "Chatr\Chatr.csproj", "{77E20C40-965F-47E4-8B97-B34DC49FCA29}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatrMonitor", "ChatrMonitor\ChatrMonitor.csproj", "{D3225BFE-1BBE-41FC-97F7-428247E8E722}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{77E20C40-965F-47E4-8B97-B34DC49FCA29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77E20C40-965F-47E4-8B97-B34DC49FCA29}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77E20C40-965F-47E4-8B97-B34DC49FCA29}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77E20C40-965F-47E4-8B97-B34DC49FCA29}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19AA6566-02D8-47CF-B4B7-598EDA9B93E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{19AA6566-02D8-47CF-B4B7-598EDA9B93E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19AA6566-02D8-47CF-B4B7-598EDA9B93E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19AA6566-02D8-47CF-B4B7-598EDA9B93E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77E20C40-965F-47E4-8B97-B34DC49FCA29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77E20C40-965F-47E4-8B97-B34DC49FCA29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77E20C40-965F-47E4-8B97-B34DC49FCA29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77E20C40-965F-47E4-8B97-B34DC49FCA29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3225BFE-1BBE-41FC-97F7-428247E8E722}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3225BFE-1BBE-41FC-97F7-428247E8E722}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3225BFE-1BBE-41FC-97F7-428247E8E722}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3225BFE-1BBE-41FC-97F7-428247E8E722}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
