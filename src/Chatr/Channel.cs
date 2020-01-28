@@ -72,6 +72,16 @@ namespace Chatr
         }
 
         /// <summary>
+        /// Builds the ping message.
+        /// </summary>
+        /// <param name="target">The target user.</param>
+        /// <returns>The message.</returns>
+        private byte[] BuildPingMessage(string target)
+        {
+            return Encoding.UTF8.GetBytes(_settings.DisplayName + ">/" + CommandList.USER_PING + " " + target);
+        }
+
+        /// <summary>
         /// Builds a rename message.
         /// </summary>
         /// <param name="newName">The new name.</param>
@@ -96,11 +106,6 @@ namespace Chatr
             {
                 return Encoding.UTF8.GetBytes(_settings.DisplayName + $">/pm {target} " + text);
             }
-        }
-
-        private byte[] BuildPingMessage(string target)
-        {
-            return Encoding.UTF8.GetBytes(_settings.DisplayName + ">/" + CommandList.USER_PING + " " + target);
         }
 
         /// <summary>
