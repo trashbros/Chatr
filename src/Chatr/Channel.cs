@@ -98,6 +98,11 @@ namespace Chatr
             }
         }
 
+        private byte[] BuildPingMessage(string target)
+        {
+            return Encoding.UTF8.GetBytes(_settings.DisplayName + ">/" + CommandList.USER_PING + " " + target);
+        }
+
         /// <summary>
         /// Create a connection with the current channel settings
         /// </summary>
@@ -222,6 +227,7 @@ namespace Chatr
                     {
                         _users.Add(senderName);
                         DisplayMessage(FormatMessageText($"[{ senderName } has logged on!]"), SystemMessageColor);
+                        Send(BuildPingMessage(senderName));
                     }
                     break;
                 // Notified a user changed their display name
