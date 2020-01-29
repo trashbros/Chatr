@@ -29,6 +29,7 @@ namespace ChatrConsole
 
         private static readonly string Prompt = SR.Prompt;
         private static readonly List<string> s_messageHistory = new List<string>();
+        private static readonly object s_outputLock = new object();
         private static Chatr.MultiChannel s_chatrClient;
         private static string s_currentInput = string.Empty;
         private static int s_historyIndex = -1;
@@ -53,11 +54,15 @@ namespace ChatrConsole
         /// </summary>
         private static void DisplayInput()
         {
-            // Clear the previous message input
-            ClearInputLines();
+            // synchronized console output
+            lock (s_outputLock)
+            {
+                // Clear the previous message input
+                ClearInputLines();
 
-            // Display the new message input
-            Console.Write(Prompt + s_nextInput);
+                // Display the new message input
+                Console.Write(Prompt + s_nextInput);
+            }
         }
 
         /// <summary>
@@ -66,14 +71,27 @@ namespace ChatrConsole
         /// <param name="message">Message to display</param>
         private static void DisplayMessage(string message, string textColor)
         {
-            ClearInputLines();
-            if (Enum.TryParse<ConsoleColor>(textColor, true, out ConsoleColor consoleColor))
+            // synchronized console output
+            lock (s_outputLock)
             {
-                Console.ForegroundColor = consoleColor;
+                // Clear the previous message input
+                ClearInputLines();
+
+                // Set the text color
+                if (Enum.TryParse<ConsoleColor>(textColor, true, out ConsoleColor consoleColor))
+                {
+                    Console.ForegroundColor = consoleColor;
+                }
+
+                // Display the messaage
+                Console.Write(message);
+
+                // Reset the text color
+                Console.ResetColor();
+
+                // Display any ongoing message input
+                Console.Write(Environment.NewLine + Prompt + s_nextInput);
             }
-            Console.Write(message);
-            Console.ResetColor();
-            Console.Write(Environment.NewLine + Prompt + s_nextInput);
         }
 
         /// <summary>
