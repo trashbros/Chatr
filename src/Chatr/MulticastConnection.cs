@@ -145,7 +145,7 @@ namespace Chatr
                             {
                                 Array.Resize(ref datagram, length);
 
-                                MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(datagram, remoteIPEndPoint.Address));
+                                MessageReceivedEventHandler?.Invoke(this, new MessageReceivedEventArgs(datagram, ((IPEndPoint)(remoteEndPoint)).Address));
                             }
                         }
 
