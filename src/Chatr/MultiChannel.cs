@@ -230,7 +230,8 @@ The source code can be found at https://github.com/trashbros/Chatr/
 
                 // Not a valid command string
                 default:
-                    DisplayMessage("Invalid command!\n", globalSettings.SystemMessageColor);
+                    // Send it as a text message
+                    TextMessage('/' + message);
                     break;
             }
         }
