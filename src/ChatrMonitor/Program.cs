@@ -57,12 +57,12 @@ namespace ChatrMonitor
                         string message = Encoding.UTF8.GetString(xform.Decode(eventArgs.Message));
 
                         // Print the message to the console
-                        Console.WriteLine(message);
+                        Console.WriteLine($"[{eventArgs.SenderIP}] {message}");
                     }
                     catch (CryptographicException)
                     {
                         // Print a message indicating that we recevied a message we couldn't decode.
-                        Console.WriteLine($"Unable to decode message from {eventArgs.SenderIP}");
+                        Console.WriteLine($"[{eventArgs.SenderIP}] ??? Unable to decode message ???");
                     }
                 };
 
