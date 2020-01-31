@@ -1,4 +1,9 @@
-[GLOBAL]
+#
+# Example .chatrconfig
+#
+
+[GLOBAL] # Global config defaults
+
 DisplayName = Globalname
 ConnectionIP = XXX.XXX.XXX.XXX
 MulticastIP = 239.255.10.11
@@ -8,14 +13,14 @@ BaseColor = white
 PMColor = magenta
 SystemMessageColor = yellow
 
-[CHANNEL]
+[CHANNEL] # Channel chan1 specific config
 ChannelName = chan1
 ConnectionIP = XXX.XXX.XXX.XXX
 MulticastIP = XXX.XXX.XXX.XXX
 Port = 1314
 Password = password
 
-[CHANNEL]
+[CHANNEL] # Channel chan 2 specific config
 ChannelName = chan2
 DisplayName = diffusername
 Port = 1320

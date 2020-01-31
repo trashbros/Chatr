@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Chatr
 {
@@ -383,6 +384,15 @@ The source code can be found at https://github.com/trashbros/Chatr/
                 new System.IO.StreamReader(filepath);
             while ((line = file.ReadLine()) != null)
             {
+                // Remove comments
+                line = Regex.Replace(line, "#.*$", "");
+
+                // Remove any leading or trailing white space characters
+                line = line.Trim();
+
+                // Check for null or empty after removing comments and trimming
+                if (string.IsNullOrEmpty(line)) continue;
+
                 if (line == "[GLOBAL]")
                 {
                     isglobal = true;
