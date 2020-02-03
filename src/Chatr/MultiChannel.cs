@@ -22,7 +22,28 @@ namespace Chatr
             m_filepath = filepath;
             ParseSettings(m_filepath);
             // TODO: instantiate channels
-            // TODO: Ask for channel info if no channel exists.
+
+            SetupChannel();
+        }
+
+        public MultiChannel(string username, string ipAddress, string filepath)
+        {
+            channelList = new List<Channel>();
+            m_filepath = filepath;
+            ParseSettings(m_filepath, true);
+            globalSettings.DisplayName = username;
+            globalSettings.ConnectionIP = ipAddress;
+
+            SetupChannel();
+        }
+
+        public void SetupChannel()
+        {
+            if(channelList.Count <= 0)
+            {
+                channelList.Add(new Channel(new ChannelSettings("-cn Main", globalSettings)));
+                channelList[channelList.Count - 1].MessageDisplayEventHandler += (sender, m) => { this.MessageDisplayEventHandler(sender, m); };
+            }
         }
 
         public void ShutDown()
@@ -88,6 +109,7 @@ namespace Chatr
 | /{CommandList.CHANGE_CHANNEL} [channel]         | Change active channel to [channel]                 |
 | /{CommandList.ADD_CHANNEL} [channel settings]    | Add a new channel using [channel settings]         |
 | /{CommandList.CHANNEL_LIST}                      | Get a listing of connected channels                |
+| /{CommandList.CHANNEL_LIST} all                  | Get a listing of ALL channels                      |
 | /{CommandList.CHANNEL_INFO} [channel]            | Display information about [channel]                |
 | /{CommandList.CONNECT} [channel]         | Connect to [channel]                               |
 
@@ -365,7 +387,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
         /// Parse the settings from your settings file and pass them as commands to add channels and globals
         /// </summary>
         /// <param name="filepath"></param>
-        private void ParseSettings(string filepath)
+        private void ParseSettings(string filepath, bool newSettings = false)
         {
             bool isglobal = true;
             bool hasglobal = false;
@@ -373,7 +395,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
             string channelInfo = "";
             List<string> channelstrings = new List<string>();
 
-            if (!System.IO.File.Exists(filepath))
+            if (!System.IO.File.Exists(filepath) || newSettings)
             {
                 globalSettings = new GlobalSettings();
                 return;

@@ -123,6 +123,15 @@ namespace ChatrConsole
                 path = System.IO.Path.GetFullPath(settingsPath);
             }
 
+            if(!IsPathValidRootedLocal(path))
+            {
+                path = (Environment.OSVersion.Platform == PlatformID.Unix ||
+                   Environment.OSVersion.Platform == PlatformID.MacOSX)
+    ? Environment.GetEnvironmentVariable("HOME")
+    : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+                path = System.IO.Path.Combine(path, ".chatrconfig");
+            }
+
             return path;
         }
 
@@ -160,8 +169,11 @@ namespace ChatrConsole
             // Try and read the settings path from the command line arguments
             string settingsPath = (args == null || args.Length == 0) ? null : args[0];
 
+            // Check if it actually has a config
+            bool noSettings = !IsPathValidRootedLocal(settingsPath) && !IsPathValidRootedLocal(System.IO.Path.GetFullPath(".chatrconfig"));
+
             // Startup the Chatr client
-            StartupChatr(GetSettingsPath(settingsPath));
+            StartupChatr(GetSettingsPath(settingsPath), !noSettings);
 
             // Read and process commands entered by the user until the quit message is entered
             ReadAndProcessMessagesUntilQuit();
@@ -313,10 +325,22 @@ namespace ChatrConsole
         /// Start a new Chatr client using the settings from <paramref name="settingsPath"/>
         /// </summary>
         /// <param name="settingsPath">File path to chatr settings file</param>
-        private static void StartupChatr(string settingsPath)
+        private static void StartupChatr(string settingsPath, bool hasSettings = true)
         {
-            // Create a new Chatr client
-            s_chatrClient = new Chatr.MultiChannel(settingsPath);
+            if (!hasSettings)
+            {
+                // TODO: Ask for a username/ip address
+                string username = "user";
+                string ipaddr = "localhost";
+
+                // Create a new Chatr client
+                s_chatrClient = new Chatr.MultiChannel(username,ipaddr,settingsPath);
+            }
+            else
+            {
+                // Create a new Chatr client
+                s_chatrClient = new Chatr.MultiChannel(settingsPath);
+            }
 
             // Attach a message display handler
             s_chatrClient.MessageDisplayEventHandler += (sender, m) =>
