@@ -12,7 +12,7 @@ jobs:
     - name: Build DocFX Documentation
       uses: nikeee/docfx-action@v0.1.0
       with:
-        args: "./docs/docfx.json"
+        args: "docfx.json"
     - name: Publish to github pages
       uses: crazy-max/ghaction-github-pages@v1.2.5
       with:
