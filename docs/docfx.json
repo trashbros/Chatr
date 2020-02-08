@@ -4,11 +4,11 @@
       "src": [
         {
           "files": [
-            "../src/**/**.csproj"
+            "src/**/**.csproj"
           ],
           "exclude": [
-            "../**/bin/**",
-            "../**/obj/**",
+            "**/bin/**",
+            "**/obj/**",
             "_site/**"
           ]
         }
@@ -48,7 +48,7 @@
           "apidoc/**.md"
         ],
         "exclude": [
-          "../obj/**",
+          "obj/**",
           "_site/**"
         ]
       }
