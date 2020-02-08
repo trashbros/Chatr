@@ -9,10 +9,10 @@ jobs:
       uses: actions/checkout@v1
     - name: Create index.md
       run: mv README.md index.md
-    - name: Build DocFX Documentaiton
+    - name: Build DocFX Documentation
       uses: nikeee/docfx-action@v0.1.0
       with:
-        args: "docfx.json"
+        args: "./docs/docfx.json"
     - name: Publish to github pages
       uses: crazy-max/ghaction-github-pages@v1.2.5
       with:
