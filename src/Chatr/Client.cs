@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Chatr
 {
-    public class MultiChannel
+    public class Client
     {
         public event EventHandler<string[]> MessageDisplayEventHandler;
 
@@ -16,7 +16,7 @@ namespace Chatr
 
         private int activeChannelIndex = -1;
 
-        public MultiChannel(string filepath)
+        public Client(string filepath)
         {
             channelList = new List<Channel>();
             m_filepath = filepath;
@@ -26,7 +26,7 @@ namespace Chatr
             SetupChannel();
         }
 
-        public MultiChannel(string username, string ipAddress, string filepath)
+        public Client(string username, string ipAddress, string filepath)
         {
             channelList = new List<Channel>();
             m_filepath = filepath;
@@ -522,7 +522,7 @@ The source code can be found at https://github.com/trashbros/Chatr/
         ///   </para>
         ///   <para>
         ///     <font color="#333333">
-        ///       <strong>NOTE:</strong> This function is called on shutdown of the multichannel class, and silently overwrites any file at the existing location. This is how the program stores and saves any changes made while running Chatr.</font>
+        ///       <strong>NOTE:</strong> This function is called on shutdown of the client class, and silently overwrites any file at the existing location. This is how the program stores and saves any changes made while running Chatr.</font>
         ///   </para>
         /// </summary>
         private void CreateSettingsFile()

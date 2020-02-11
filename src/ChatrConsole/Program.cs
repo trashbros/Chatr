@@ -30,7 +30,7 @@ namespace ChatrConsole
         private static readonly string Prompt = SR.Prompt;
         private static readonly List<string> s_messageHistory = new List<string>();
         private static readonly object s_outputLock = new object();
-        private static Chatr.MultiChannel s_chatrClient;
+        private static Chatr.Client s_chatrClient;
         private static string s_currentInput = string.Empty;
         private static int s_historyIndex = -1;
         private static string s_nextInput = string.Empty;
@@ -334,12 +334,12 @@ namespace ChatrConsole
                 string ipaddr = "localhost";
 
                 // Create a new Chatr client
-                s_chatrClient = new Chatr.MultiChannel(username,ipaddr,settingsPath);
+                s_chatrClient = new Chatr.Client(username,ipaddr,settingsPath);
             }
             else
             {
                 // Create a new Chatr client
-                s_chatrClient = new Chatr.MultiChannel(settingsPath);
+                s_chatrClient = new Chatr.Client(settingsPath);
             }
 
             // Attach a message display handler
