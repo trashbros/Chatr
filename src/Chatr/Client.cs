@@ -18,6 +18,13 @@ namespace Chatr
 
         public Client(string filepath)
         {
+            Configuration config = new Configuration(@"C:\Users\jgoulder\Desktop\chatrconfig_new");
+
+            Console.WriteLine(config.ColorSchemes["Default"].RecvMsgColor);
+            Console.WriteLine(config.ColorSchemes["Default"].OwnSendMsgColor);
+            Console.WriteLine(config.ColorSchemes["Jordan"].RecvMsgColor);
+            Console.WriteLine(config.ColorSchemes["Jordan"].OwnSendMsgColor);
+
             channelList = new List<Channel>();
             m_filepath = filepath;
             ParseSettings(m_filepath);
