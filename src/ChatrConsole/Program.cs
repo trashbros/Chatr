@@ -163,6 +163,7 @@ namespace ChatrConsole
         /// <param name="args">Command line arguments</param>
         private static void Main(string[] args)
         {
+            System.AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
             // Display the assembly version information
             DisplayVersion();
 
@@ -411,6 +412,15 @@ namespace ChatrConsole
 
             // command not handled
             return false;
+        }
+
+        static void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine(e.ExceptionObject.ToString());
+            Console.WriteLine("Press Enter to continue");
+            Console.ReadLine();
+            ShutdownChatr();
+            Environment.Exit(1);
         }
 
         #endregion Private Methods
