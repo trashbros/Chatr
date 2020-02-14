@@ -126,9 +126,9 @@ namespace ChatrConsole
             if(!IsPathValidRootedLocal(path))
             {
                 path = (Environment.OSVersion.Platform == PlatformID.Unix ||
-                   Environment.OSVersion.Platform == PlatformID.MacOSX)
-    ? Environment.GetEnvironmentVariable("HOME")
-    : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+                   Environment.OSVersion.Platform == PlatformID.MacOSX) ? 
+                    Environment.GetEnvironmentVariable("HOME") : 
+                    Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
                 path = System.IO.Path.Combine(path, ".chatrconfig");
             }
 
@@ -329,9 +329,42 @@ namespace ChatrConsole
         {
             if (!hasSettings)
             {
-                // TODO: Ask for a username/ip address
                 string username = "user";
-                string ipaddr = "localhost";
+                string ipaddr = "";
+
+                // TODO: Ask for a username/ip address
+                // Console.Writeline("No config file found!\n\nWelcome to Chatr!");
+                // Console.Writeline("What name do you want to show other users?");
+                // // Get user input for username
+                // username = input;
+                // Console.Writeline("Thanks! Now please select which network you want to communicate on:");
+                // var listNetOptions = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+                // while(ipaddr == "")
+                // {
+                //     // List the networks available on this computer with numerals in front for selectors, and a 0 option for a different one
+                //     Console.Writeline("0    Other IP Address");
+                //     for(int i = 0; i < listNetOptions.Length; i++)
+                //     {
+                //          Console.Writeline(string.Format("{0}    {1}",i+1,listNetOptions[i]));
+                //     }
+                //     // Get the user input
+                //     if(input == "0")
+                //     {
+                //         Console.Writeline("Please provide your desired IP address:");
+                //         // Get the users input as an IP address
+                //         ipaddr = input;
+                //     }
+                //     else if(listNetOptions.Length > input - 1
+                //     {
+                //         ipaddr = listNetOptions[input - 1];
+                //     }
+                //     else
+                //     {
+                //         // User provided invalid input
+                //         Console.Writeline("Not a valid option! Please select a communication network:");
+                //         ipaddr = "";
+                //     }
+                // }
 
                 // Create a new Chatr client
                 s_chatrClient = new Chatr.Client(username,ipaddr,settingsPath);
