@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatrConsole", "ChatrConsol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chatr", "Chatr\Chatr.csproj", "{77E20C40-965F-47E4-8B97-B34DC49FCA29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatrMonitor", "ChatrMonitor\ChatrMonitor.csproj", "{D3225BFE-1BBE-41FC-97F7-428247E8E722}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatrMonitor", "ChatrMonitor\ChatrMonitor.csproj", "{D3225BFE-1BBE-41FC-97F7-428247E8E722}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IniUtils", "IniUtils\IniUtils.csproj", "{485114A2-0382-490D-8430-C5722F3EF1E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{D3225BFE-1BBE-41FC-97F7-428247E8E722}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3225BFE-1BBE-41FC-97F7-428247E8E722}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3225BFE-1BBE-41FC-97F7-428247E8E722}.Release|Any CPU.Build.0 = Release|Any CPU
+		{485114A2-0382-490D-8430-C5722F3EF1E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{485114A2-0382-490D-8430-C5722F3EF1E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{485114A2-0382-490D-8430-C5722F3EF1E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{485114A2-0382-490D-8430-C5722F3EF1E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
