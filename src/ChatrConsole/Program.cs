@@ -20,6 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Net;
 
 namespace ChatrConsole
 {
@@ -126,9 +128,9 @@ namespace ChatrConsole
             if(!IsPathValidRootedLocal(path))
             {
                 path = (Environment.OSVersion.Platform == PlatformID.Unix ||
-                   Environment.OSVersion.Platform == PlatformID.MacOSX)
-    ? Environment.GetEnvironmentVariable("HOME")
-    : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+                   Environment.OSVersion.Platform == PlatformID.MacOSX) ? 
+                    Environment.GetEnvironmentVariable("HOME") : 
+                    Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
                 path = System.IO.Path.Combine(path, ".chatrconfig");
             }
 
@@ -143,7 +145,7 @@ namespace ChatrConsole
         private static bool IsPathValidRootedLocal(String pathString)
         {
             bool isValidUri = Uri.TryCreate(pathString, UriKind.Absolute, out Uri pathUri);
-            return isValidUri && pathUri != null && pathUri.IsLoopback;
+            return isValidUri && pathUri != null && pathUri.IsLoopback && File.Exists(pathString);
         }
 
         /// <summary>
@@ -163,6 +165,7 @@ namespace ChatrConsole
         /// <param name="args">Command line arguments</param>
         private static void Main(string[] args)
         {
+            System.AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
             // Display the assembly version information
             DisplayVersion();
 
@@ -329,9 +332,73 @@ namespace ChatrConsole
         {
             if (!hasSettings)
             {
-                // TODO: Ask for a username/ip address
-                string username = "user";
-                string ipaddr = "localhost";
+
+                // Hello, new user!
+                Console.WriteLine("No config file found!\n\nWelcome to Chatr!");
+
+                // Ask for a username/ip address
+                Console.Write("What name do you want to show other users? ");
+
+                // Get user input for username
+                string username = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    Console.WriteLine("OK, that's cool, come back later when you want to chat!");
+                    Environment.Exit(0);
+                }
+
+                Console.WriteLine("Thanks! Now please select which network you want to communicate on:");
+
+                string ipaddr = null;
+
+                var listNetOptions = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+                while(string.IsNullOrEmpty(ipaddr))
+                {
+                    // List the networks available on this computer with numerals in front for selectors, and a 0 option for a different one
+                    Console.WriteLine("   0)    Other IP Address");
+                    for (int i = 0; i < listNetOptions.Length; i++)
+                    {
+                        Console.WriteLine(string.Format("   {0})    {1}", i + 1, listNetOptions[i]));
+                    }
+                    Console.WriteLine(string.Format("   {0})    Quit", listNetOptions.Length));
+
+                    // Get the user input
+                    var choiceString = Console.ReadLine();
+                    int choice = -1;
+
+                    int.TryParse(choiceString, out choice);
+
+                    if (choice == 0)
+                    {
+                        Console.Write("Please provide your desired IP address:");
+
+                        // Get the users input as an IP address
+                        var ipString = Console.ReadLine();
+                        if (!IPAddress.TryParse(ipString, out IPAddress addr))
+                        {
+                            Console.WriteLine("That's not a valid IP address!\n\nPlease select a communication network:");
+                        }
+                        else
+                        {
+                            ipaddr = ipString;
+                        }
+                    }
+                    else if (listNetOptions.Length > choice - 1)
+                    {
+                        ipaddr = listNetOptions[choice - 1].ToString();
+                    }
+                    else if (listNetOptions.Length == choice - 1)
+                    {
+                        Console.WriteLine("OK, that's cool, comeback later when you want to chat!");
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        // User provided invalid input
+                        Console.WriteLine("Not a valid option!\n\nPlease select a communication network:");
+                    }
+                }
 
                 // Create a new Chatr client
                 s_chatrClient = new Chatr.Client(username,ipaddr,settingsPath);
@@ -378,6 +445,15 @@ namespace ChatrConsole
 
             // command not handled
             return false;
+        }
+
+        static void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine(e.ExceptionObject.ToString());
+            Console.WriteLine("Press Enter to continue");
+            Console.ReadLine();
+            ShutdownChatr();
+            Environment.Exit(1);
         }
 
         #endregion Private Methods

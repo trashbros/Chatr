@@ -392,10 +392,9 @@ The source code can be found at https://github.com/trashbros/Chatr/
             MessageDisplayEventHandler?.Invoke(this, new string[] { message, textColor });
         }
 
-        /// <summary>
-        /// Parse the settings from your settings file and pass them as commands to add channels and globals
-        /// </summary>
-        /// <param name="filepath"></param>
+        /// <summary>Parse the settings from your settings file and pass them as commands to add channels and globals</summary>
+        /// <param name="filepath">The filepath.</param>
+        /// <param name="newSettings">if set to <c>true</c> then no settings file already existsW.</param>
         private void ParseSettings(string filepath, bool newSettings = false)
         {
             bool isglobal = true;
