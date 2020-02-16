@@ -7,10 +7,9 @@ namespace Chatr
     public class ColorScheme
     {
         private readonly dynamic _settingsChain;
-
         public string RecvMsgColor
         {
-            get => _settingsChain.RecvMsgColor ?? "white";
+            get => _settingsChain.RecvMsgColor;
             set => _settingsChain.RecvMsgColor = value;
         }
 
@@ -18,7 +17,7 @@ namespace Chatr
 
         public string SendMsgColor
         {
-            get => _settingsChain.SendMsgColor ?? "gray";
+            get => _settingsChain.SendMsgColor;
             set => _settingsChain.SendMsgColor = value;
         }
 
@@ -26,7 +25,7 @@ namespace Chatr
 
         public string PrivateMsgColor
         {
-            get => _settingsChain.PrivateMsgColor ?? "magenta";
+            get => _settingsChain.PrivateMsgColor;
             set => _settingsChain.PrivateMsgColor = value;
         }
 
@@ -34,8 +33,8 @@ namespace Chatr
 
         public string SystemMsgColor
         {
-            get => _settingsChain.SysMsgColor ?? "yellow";
-            set => _settingsChain.SysMsgColor = value;
+            get => _settingsChain.SystemMsgColor;
+            set => _settingsChain.SystemMsgColor = value;
         }
 
         public string OwnSystemMsgColor => _settingsChain.OwnSystemMsgColor;
@@ -58,6 +57,20 @@ namespace Chatr
             _settingsChain = new SettingsChain();
             Name = name;
             Parent = parent;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"Name            {Name}");
+            sb.AppendLine($"Parent Name     {Parent?.Name ?? "<None>"}");
+            sb.AppendLine($"RecvMsgColor    {RecvMsgColor} ({OwnRecvMsgColor})");
+            sb.AppendLine($"SendMsgColor    {SendMsgColor} ({OwnSendMsgColor})");
+            sb.AppendLine($"PrivateMsgColor {PrivateMsgColor} ({OwnPrivateMsgColor})");
+            sb.AppendLine($"SystemMsgColor  {SystemMsgColor} ({OwnSystemMsgColor})");
+
+            return sb.ToString();
         }
     }
 }

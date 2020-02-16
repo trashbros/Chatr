@@ -237,7 +237,7 @@ namespace IniUtils
             ThrowExceptionIfNull(name, nameof(name));
 
             // Initialize the value to the default in case we don't find it
-            var value = defaultValue?.TrimEnd() ?? "";
+            var value = defaultValue;
 
             // A regex that will match the specified section
             var specificSectionRegex = new Regex($@"^\s*\[\s*({section})\s*\].*$");

@@ -18,14 +18,9 @@ namespace Chatr
 
         public Client(string filepath)
         {
+            // TODO: Use config
             Configuration config = new Configuration(filepath);
-
-            /*
-            Console.WriteLine(config.ColorSchemes["Default"].RecvMsgColor);
-            Console.WriteLine(config.ColorSchemes["Default"].OwnSendMsgColor);
-            Console.WriteLine(config.ColorSchemes["Jordan"].RecvMsgColor);
-            Console.WriteLine(config.ColorSchemes["Jordan"].OwnSendMsgColor);
-            */
+            Console.WriteLine(config);
 
             channelList = new List<Channel>();
             m_filepath = filepath;
