@@ -336,17 +336,37 @@ namespace ChatrConsole
                 // Hello, new user!
                 Console.WriteLine("No config file found!\n\nWelcome to Chatr!");
 
-                // Ask for a username/ip address
-                Console.Write("What name do you want to show other users? ");
+                
 
-                // Get user input for username
-                string username = Console.ReadLine();
+                bool goodUser = false;
 
-                if (string.IsNullOrWhiteSpace(username))
+                string username = "";
+
+                while (!goodUser)
                 {
-                    Console.WriteLine("OK, that's cool, come back later when you want to chat!");
-                    Environment.Exit(0);
+                    // Ask for a username/ip address
+                    Console.Write("What name do you want to show other users? ");
+
+                    // Get user input for username
+                    username = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(username) || username.StartsWith('/') || username == Chatr.CommandList.QUIT || username == Chatr.CommandList.QUIT_S)
+                    {
+                        Console.WriteLine("Bad username. Do you want to quit? (y/n)");
+
+                        var yesno = Console.ReadLine().ToLower();
+                        if (yesno == "y" || yesno == "yes")
+                        {
+                            Console.WriteLine("Okay bye!");
+                            Environment.Exit(0);
+                        }
+                    }
+                    else
+                    {
+                        goodUser = true;
+                    }
                 }
+
 
                 Console.WriteLine("Thanks! Now please select which network you want to communicate on:");
 
@@ -361,7 +381,7 @@ namespace ChatrConsole
                     {
                         Console.WriteLine(string.Format("   {0})    {1}", i + 1, listNetOptions[i]));
                     }
-                    Console.WriteLine(string.Format("   {0})    Quit", listNetOptions.Length));
+                    Console.WriteLine(string.Format("   {0})    Quit", listNetOptions.Length + 1));
 
                     // Get the user input
                     var choiceString = Console.ReadLine();
