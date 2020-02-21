@@ -21,7 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 
 namespace ChatrConsole
 {
@@ -336,8 +338,6 @@ namespace ChatrConsole
                 // Hello, new user!
                 Console.WriteLine("No config file found!\n\nWelcome to Chatr!");
 
-                
-
                 bool goodUser = false;
 
                 string username = "";
@@ -352,12 +352,12 @@ namespace ChatrConsole
 
                     if (string.IsNullOrWhiteSpace(username) || username.StartsWith('/') || username == Chatr.CommandList.QUIT || username == Chatr.CommandList.QUIT_S)
                     {
-                        Console.WriteLine("Bad username. Do you want to quit? (y/n)");
+                        Console.WriteLine("Bad username. Do you want to quit? (y/N)");
 
                         var yesno = Console.ReadLine().ToLower();
                         if (yesno == "y" || yesno == "yes")
                         {
-                            Console.WriteLine("Okay bye!");
+                            Console.WriteLine("Okay, bye!");
                             Environment.Exit(0);
                         }
                     }
@@ -367,56 +367,80 @@ namespace ChatrConsole
                     }
                 }
 
-
-                Console.WriteLine("Thanks! Now please select which network you want to communicate on:");
+                Console.WriteLine("Thanks!");
+                Console.WriteLine();
 
                 string ipaddr = null;
 
-                var listNetOptions = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+                var ipAddressList = Dns.GetHostAddresses(Dns.GetHostName())
+                    .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork && !ip.Equals(IPAddress.Loopback));
+
                 while(string.IsNullOrEmpty(ipaddr))
                 {
-                    // List the networks available on this computer with numerals in front for selectors, and a 0 option for a different one
-                    Console.WriteLine("   0)    Other IP Address");
-                    for (int i = 0; i < listNetOptions.Length; i++)
+                    Console.WriteLine("Please select which network you want to communicate on:");
+
+                    // List the networks available on this computer
+                    int index = 0;
+                    foreach (var ipAddress in ipAddressList)
                     {
-                        Console.WriteLine(string.Format("   {0})    {1}", i + 1, listNetOptions[i]));
+                        Console.WriteLine($"   {++index}) {ipAddress}");
                     }
-                    Console.WriteLine(string.Format("   {0})    Quit", listNetOptions.Length + 1));
+
+                    Console.WriteLine($"   {++index}) Manually enter IP");
+                    Console.WriteLine($"   {++index}) Quit");
+
+                    Console.WriteLine();
+                    Console.Write($"Enter your choice [1-{index}] [Default: 1] : ");
 
                     // Get the user input
-                    var choiceString = Console.ReadLine();
-                    int choice = -1;
+                    var choiceString = Console.ReadLine().Trim();
 
-                    int.TryParse(choiceString, out choice);
+                    int choice;
 
-                    if (choice == 0)
+                    if (string.IsNullOrEmpty(choiceString))
                     {
-                        Console.Write("Please provide your desired IP address:");
+                        choice = 1;
+                    }
+                    else
+                    {
+                        if (!int.TryParse(choiceString, out choice))
+                        {
+                            choice = -1;
+                        }
+                    }
+
+                    if (choice == ipAddressList.Count() + 1)
+                    {
+                        Console.Write("Please provide your desired IP address: ");
 
                         // Get the users input as an IP address
                         var ipString = Console.ReadLine();
                         if (!IPAddress.TryParse(ipString, out IPAddress addr))
                         {
-                            Console.WriteLine("That's not a valid IP address!\n\nPlease select a communication network:");
+                            Console.WriteLine("That's not a valid IP address!");
+                            Console.WriteLine();
+                            Console.WriteLine();
                         }
                         else
                         {
-                            ipaddr = ipString;
+                            ipaddr = addr.ToString();
                         }
                     }
-                    else if (listNetOptions.Length > choice - 1)
+                    else if (choice == ipAddressList.Count() + 2)
                     {
-                        ipaddr = listNetOptions[choice - 1].ToString();
-                    }
-                    else if (listNetOptions.Length == choice - 1)
-                    {
-                        Console.WriteLine("OK, that's cool, comeback later when you want to chat!");
+                        Console.WriteLine("Okay, bye!");
                         Environment.Exit(0);
+                    }
+                    else if (choice > 0 && choice <= ipAddressList.Count())
+                    {
+                        ipaddr = ipAddressList.ElementAt(choice - 1).ToString();
                     }
                     else
                     {
                         // User provided invalid input
-                        Console.WriteLine("Not a valid option!\n\nPlease select a communication network:");
+                        Console.WriteLine("That's not a valid choice!");
+                        Console.WriteLine();
+                        Console.WriteLine();
                     }
                 }
 
