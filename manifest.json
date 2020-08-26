@@ -1,0 +1,320 @@
+{
+  "homepages": [],
+  "source_base_path": "/github/workspace",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Conceptual",
+      "source_relative_path": "BUILDING.md",
+      "output": {
+        ".html": {
+          "relative_path": "BUILDING.html",
+          "hash": "a4Z8vt3UkYXonLTT9M5O5Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.Channel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.Channel.html",
+          "hash": "MzvbFuxUNfkM6m3NIMCSuA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.ChannelInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.ChannelInfo.html",
+          "hash": "2+ojTerKxJaQVJmKoARlRg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.ChannelSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.ChannelSettings.html",
+          "hash": "pSkM67gXqNj7I1B9L5ApvQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.Client.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.Client.html",
+          "hash": "C+eDKKSH7dIguM7pFmB+MA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.ColorScheme.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.ColorScheme.html",
+          "hash": "kLb+iUPIjq3KFWWI8DwcLA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.CommandList.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.CommandList.html",
+          "hash": "s8vV3FhCJEQNb1Fvmv/tFw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.Configuration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.Configuration.html",
+          "hash": "Anni0O9nLlkw+OzcP7y0Wg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.ConnectionInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.ConnectionInfo.html",
+          "hash": "uT1BPzT8lXGpUiWSk6D+NQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.GlobalSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.GlobalSettings.html",
+          "hash": "SkkNaT/Gub7xHY9xu59/lw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.Helpers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.Helpers.html",
+          "hash": "MT0OGKSdWji4YrBshQYmjQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.IMessageTransform.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.IMessageTransform.html",
+          "hash": "je5+bzHI8HJblHGZTcoCaA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.MessageReceivedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.MessageReceivedEventArgs.html",
+          "hash": "Uqv1JclpARnsp8UuJPqj0Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.MulticastConnection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.MulticastConnection.html",
+          "hash": "zcMTr5hnNP9MgbBrEwSVtg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.PasswordEncryptedMessageTransform.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.PasswordEncryptedMessageTransform.html",
+          "hash": "Pl/R6zFj4WtuYHpQ1sDT4Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.SettingsChain.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.SettingsChain.html",
+          "hash": "A1KqoXN6sLPYZnIpEY4I6Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Chatr.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Chatr.html",
+          "hash": "kTBBWmg/pageOAbp41+lHg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/IniUtils.IniFile.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/IniUtils.IniFile.html",
+          "hash": "oxPS8k6nN5BHthheeU2NsA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/IniUtils.Setting.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/IniUtils.Setting.html",
+          "hash": "Zgw+3mXIGLSVxwAP/GhADA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/IniUtils.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/IniUtils.html",
+          "hash": "IQlqWOM+hZKqG619q5aHPA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "hxq9CW8vUCBaNNiUl8QuqQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "slnxlyFdujn3QEhK3hoTag=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot build incrementally because last build info is missing.",
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0,
+        "full_build_reason_code": "NoAvailableBuildCache"
+      },
+      "processors": {
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        },
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 2,
+          "skipped_file_count": 0
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 19,
+          "skipped_file_count": 0
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: last post processor info is null.",
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
